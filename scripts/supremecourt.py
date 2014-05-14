@@ -4,6 +4,7 @@ from sklearn import svm
 import sys
 import os
 import readdata
+import liwc
 
 def bag_of_words():
     all_utterances = readdata.read_supreme_court()
