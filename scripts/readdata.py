@@ -24,3 +24,11 @@ def read_supreme_court():
             all_utterances.append(u)
     print "Supreme Court data read"
     return all_utterances
+
+
+#utterances = read_supreme_court()
+
+# for u in xrange(0, 9):
+#     print utterances[u]
+
+# for speaker in utterances
