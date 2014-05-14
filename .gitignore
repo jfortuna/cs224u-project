@@ -54,3 +54,6 @@ docs/_build/
 
 # Data
 data/
+
+# Swap files
+*.swp
