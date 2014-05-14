@@ -6,7 +6,7 @@ import os
 import utils
 
 def bag_of_words():
-    all_utterances = readdata.read_supreme_court()
+    all_utterances = utils.read_supreme_court()
 
 def stylistic_features():
     pass
