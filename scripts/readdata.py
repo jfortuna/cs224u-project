@@ -22,5 +22,16 @@ def read_supreme_court():
             u['presentation_side'] = splits[6]
             u['utterance'] = splits[7]
             all_utterances.append(u)
+
+
     print len(all_utterances)
+    
     return all_utterances
+
+
+utterances = read_supreme_court()
+
+# for u in xrange(0, 9):
+#     print utterances[u]
+
+# for speaker in utterances
