@@ -3,10 +3,10 @@ from sklearn import svm
 
 import sys
 import os
-import utils
+import readdata
 
 def bag_of_words():
-    all_utterances = utils.read_supreme_court()
+    all_utterances = readdata.read_supreme_court()
 
 def stylistic_features():
     pass
