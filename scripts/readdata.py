@@ -5,7 +5,7 @@ def read_supreme_court():
     all_utterances = {}
     speaker_pairs = {}
     with open('../data/supreme_court_dialogs_corpus_v1.01/supreme.conversations.txt', 'r') as f:
-        prev_utterance_id = 0
+        prev_utterance_id = -1
         for line in f:
             u = {}
             splits = line.split(' +++$+++ ')
@@ -40,6 +40,6 @@ def read_supreme_court():
     return (all_utterances, speaker_pairs)
 
 
-all_utterances, speaker_pairs = read_supreme_court()
-print len(speaker_pairs.keys())
+#all_utterances, speaker_pairs = read_supreme_court()
+#print len(speaker_pairs.keys())
 

@@ -8,8 +8,8 @@ import readdata
 import liwc
 
 def bag_of_words():
-    all_utterances = readdata.read_supreme_court()
-    test = all_utterances[0]['utterance']
+    all_utterances, speaker_pairs = readdata.read_supreme_court()
+    test = all_utterances[2]['utterance']
     print test
     sent_tokens = tokenize.sent_tokenize(test)
     for sent_token in sent_tokens:
