@@ -3,7 +3,8 @@ absolutely
 actually
 again
 also
-anyway*
+anyway
+anyways
 anywhere
 apparently
 around
@@ -39,8 +40,12 @@ only
 perhaps
 primarily
 probably
-push*
-quick*
+push
+pushed
+pushes
+pushing
+quick
+quickly
 rarely
 rather
 really
@@ -49,7 +54,7 @@ simply
 so
 somehow
 soon
-sooo*
+sooo
 still
 such
 there

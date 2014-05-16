@@ -32,7 +32,8 @@ she'll
 shes
 she's
 thee
-their*
+their
+theirs
 them
 themselves
 they

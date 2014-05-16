@@ -5,7 +5,8 @@ after
 against
 ahead
 along
-among*
+among
+amongst
 around
 as
 at
@@ -41,12 +42,13 @@ over
 plus
 since
 than
-through*
+through
 thru
 til 
 till
 to
-toward*
+toward
+towards
 under
 underneath
 unless
