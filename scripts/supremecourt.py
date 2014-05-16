@@ -1,23 +1,22 @@
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import svm
-from nltk import tokenize
 
 import sys
 import os
 import readdata
 import utils
 
+#TODO finish the bag of words stuff, see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation and http://scikit-learn.org/stable/auto_examples/document_classification_20newsgroups.html for more info
 def bag_of_words():
-    pass
-    #TODO
+    vectorizer = CountVectorizer()
 
+#TODO
 def stylistic_features():
     pass
-    #TODO
 
+#TODO
 def coordination_features():
     pass
-    #TODO
 
 
 #testing get_liwc_counts_from_utterances

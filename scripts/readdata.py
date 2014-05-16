@@ -39,7 +39,3 @@ def read_supreme_court():
     print "Supreme Court data read"
     return (all_utterances, speaker_pairs)
 
-
-#all_utterances, speaker_pairs = read_supreme_court()
-#print len(speaker_pairs.keys())
-
