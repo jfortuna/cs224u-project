@@ -20,7 +20,7 @@ def get_liwc_counts_from_utterance(utterance):
         if token in liwc.ipronouns:
             num_ipronouns += 1
         if token in liwc.ppronouns:
-            num_pprounouns += 1
+            num_ppronouns += 1
         if token in liwc.prepositions:
             num_prepositions += 1
         if token in liwc.quantifiers:
