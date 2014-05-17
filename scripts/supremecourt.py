@@ -6,7 +6,9 @@ import os
 import readdata
 import utils
 
-#TODO finish the bag of words stuff, see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation and http://scikit-learn.org/stable/auto_examples/document_classification_20newsgroups.html for more info
+#TODO finish the bag of words stuff, 
+#see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation 
+#and http://scikit-learn.org/stable/auto_examples/document_classification_20newsgroups.html for more info
 def bag_of_words():
     vectorizer = CountVectorizer()
 
@@ -15,6 +17,7 @@ def stylistic_features():
     pass
 
 #TODO
+#Do Macro-Averaging C(b, A)
 def coordination_features():
     pass
 

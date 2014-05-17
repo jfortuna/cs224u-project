@@ -4,7 +4,7 @@ import os
 def read_supreme_court():
     all_utterances = {}
     speaker_pairs = {}
-    with open('../data/supreme_court_dialogs_corpus_v1.01/supreme.conversations.txt', 'r') as f:
+    with open('../../data/supreme_court_dialogs_corpus_v1.01/supreme.conversations.txt', 'r') as f:
         prev_utterance_id = -1
         for line in f:
             u = {}

@@ -6,7 +6,8 @@ from nltk import tokenize
 
 def get_liwc_counts_from_utterance(utterance):
     tokens = tokenize_utterance(utterance)
-    num_articles, num_aux_verbs, num_conjunctions, num_adverbs, num_ipronouns, num_ppronouns, num_prepositions, num_quantifiers = [0 for x in range(8)]
+    num_articles, num_aux_verbs, num_conjunctions, num_adverbs, num_ipronouns, num_ppronouns, num_prepositions, num_quantifiers = [0 for x in range(8)] 
+    #initializing 8 different variables all to zero
     for token in tokens:
         if token in liwc.articles:
             num_articles += 1
