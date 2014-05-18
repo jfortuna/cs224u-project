@@ -10,8 +10,8 @@ markers_int = ["1", "2", "3", "4", "5", "6", "7", "8"]
 
 ##
 #
-def svm_train(train_scores_filename, name):
-	print "Training SVM for " + name + " ..."
+def svm_train(train_scores_filename, outputfile_name):
+	print "Training SVM for " + outputfile_name + " ..."
 	all_vectors= svm_read_from_file(train_scores_filename)
 
 	svm_vectors = []
@@ -19,23 +19,60 @@ def svm_train(train_scores_filename, name):
 		svm_vector = "" + str(int(vector[0])) + ' '
 		i = 1
 		for marker in markers_int:
-			# print vector[i]
 			s = '%(markertype)s:%(value)f' % \
 				{"markertype": marker, "value": float(vector[i])}
-			# print s
-			# print vector[i]
 			svm_vector += s + ' '
 			i += 1
 		svm_vectors.append(svm_vector)
-	outputfile = name + '.svmout'
-	# print "HERSERSER"
+	outputfile = outputfile_name + '.svmout'
 	svm_write_to_file(outputfile, svm_vectors)
 
-# ['1', '-0.07246376811594202', '-0.0033444816053511683', '-0.04968944099378886', '-0.10559006211180127', '0.047101449275362306', '-0.20158102766798414', '0.030100334448160626', '-0.19130434782608696\n'], ['1', '-0.015384615384615441', '0.07051282051282048', '0.06153846153846154', '-0.06730769230769229', '0.03076923076923077', '-0.18681318681318687', '0.03076923076923077', '-0.23076923076923078\n']
-# 1 1:0.916128 2:0.063443 3:0.058924 4:0.340437 5:0.102476 6:0.299614 7:0.004428 8:0.557098 9:0.667828 10:0.614473
-# def svm_predict():
-def svm_read_from_file(filename):
+def svm_prep_test(test_data_file):
+	print "Sanitizing test data...."
+	all_vectors= svm_read_from_file(test_data_file)
 
+	svm_test_allvectors = []
+	for vector in all_vectors:
+		svm_test_vector = []
+		# float_values = map(lambda x: float(x), vector)
+		for i in range(0, len(vector)):
+			svm_test_vector.append(float(vector[i]))
+		# print svm_test_vector
+		svm_test_allvectors.append(svm_test_vector)
+		
+	# outputfile = outputfile_name + '.svmtest'
+	# svm_write_to_file(outputfile, svm_test_allvectors)
+	# print svm_test_allvectors
+	return svm_test_allvectors
+
+def svm_predict(train_data_file, test_data_file):
+	accuracy = 0.0
+	numTotal = 0.0
+	numHigh = 0.0
+	goldHigh = 0.0
+	X_train, y_train = load_svmlight_file(train_data_file)
+	clf = svm.SVC()
+	clf.fit(X_train,y_train)
+
+	test_data_list = svm_prep_test(test_data_file)
+
+	for test_data in test_data_list:
+		just_test = test_data[1:]
+		prediction = clf.predict(just_test)
+		print "sample: " + str(test_data)
+		print "prediction " + str(prediction)
+		if prediction > 0: numHigh += 1
+		if test_data[0] > 0: goldHigh +=1
+		numTotal += 1
+
+	accuracy = numHigh / goldHigh
+	print "SVM prediction: " + str(numHigh) + " out of " + str(numTotal) + " samples"
+	print "Accuracy: " + str(accuracy)
+
+# def find_accuracy():
+
+def svm_read_from_file(filename):
+	##output is a vector of string values
 	f = open(filename, 'rb')
 	lines = f.readlines()
 	f.close()
@@ -46,7 +83,6 @@ def svm_read_from_file(filename):
 		vector = newline.split(' ')
 		# print vector
 		vector_samples.append(vector)
-	# print vector_samples
 	return vector_samples
 
 def svm_write_to_file(filename_output, vectors):
@@ -56,32 +92,32 @@ def svm_write_to_file(filename_output, vectors):
 		f.write('\n')
 	f.close()
 
-def svm_test():
-	##generate generate random vectors
-	sample_vectors = [];
-	for i in xrange(0, 10):
-		sample = "" + random.choice('01') + ' '
+# def svm_test():
+# 	##generate generate random vectors
+# 	sample_vectors = [];
+# 	for i in xrange(0, 10):
+# 		sample = "" + random.choice('01') + ' '
 
-		for marker in markers_int:
-			value = random.uniform(0,1)
-			s = '%(markertype)s:%(value)f' % \
-				{"markertype": marker, "value": value}
-			sample += s + ' '
-		sample_vectors.append(sample);
+# 		for marker in markers_int:
+# 			value = random.uniform(0,1)
+# 			s = '%(markertype)s:%(value)f' % \
+# 				{"markertype": marker, "value": value}
+# 			sample += s + ' '
+# 		sample_vectors.append(sample);
 
-	# print sample_vectors
+# 	# print sample_vectors
 
-	f = open('svm_test', 'wb')
-	for sample in sample_vectors:
-		f.write(sample)
-		f.write('\n')
+# 	f = open('svm_test', 'wb')
+# 	for sample in sample_vectors:
+# 		f.write(sample)
+# 		f.write('\n')
 
-	f.close()
+# 	f.close()
 
-X_train, y_train = load_svmlight_file('svm_test')
+# X_train, y_train = load_svmlight_file('svm_test')
 
-clf = svm.SVC()
-clf.fit(X_train,y_train)
+# clf = svm.SVC()
+# clf.fit(X_train,y_train)
 
 
 # print clf.predict([0.472878, 0.344089, 0.636890, 0.311382, 0.348450, 0.040245, 0.668857, 0.365363, 0.436143, 0.478268])
@@ -89,7 +125,8 @@ clf.fit(X_train,y_train)
 
 # vectorarray = svm_read_from_file('testoutput')
 # print vectorarray
-svm_train('testoutput', 'test')
+svm_train('supremecourt_train', 'supremecourt_train')
+svm_predict('supremecourt_train.svmout', 'supremecourt_train')
 # print ""
 # print vectorarray[0].split('[')
 # print vectorarray[1].split('[')
