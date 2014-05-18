@@ -11,9 +11,6 @@ import numpy
 # using 1 to represent High Status Person
 # using -1 to represent Low Status Person
 #
-high = -1
-low = 1
-error = 0
 
 #TODO finish the bag of words stuff, 
 #see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation 
@@ -22,32 +19,14 @@ def bag_of_words():
     vectorizer = CountVectorizer()
 
 #TODO
-def stylistic_features(speaker_pairs):
-	allscores = {}
-	for pair, conversation in speaker_pairs.iteritems():
-		print pair + ": " + conversation
-		svm_vector = []
-    	label = error
-    	if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
-    		label = high
-    	if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
-    		label = high
-    	else:
-    		label = low
-    	svm_vector.append(label)
-    	C_score = tuple(speaker_pair_coordination(pair, conversation))
-    	svm_vector.append(C_score)
-    	allscores[pair] = svm_vector
-
-	return allscores
+def stylistic_features(all_speaker_pairs):
+	#includes average length of all 
+	pass
 #TODO
 #Do Macro-Averaging C(b, A)
-def coordination_features():
-    pass
-
 
 def speaker_pair_coordination(speaker_pair, conversation):
-	print speaker_pair
+	# print speaker_pair
 	b_speaker = speaker_pair[1]
 	a_target = speaker_pair[0]
 
@@ -137,14 +116,57 @@ def speaker_pair_sum_vectors(speaker_pair):
 
 	return b_a_sum
 
+def coordination_features(all_speaker_pairs):
+	print "Takes about ~2min to finish.....grab a cup of coffee"
+	allscores = {}
+	high = -1
+	low = 1
+	error = 0
+	for pair, conversation in all_speaker_pairs.iteritems():
+		# print str(pair) + ": " + str(conversation)
+		# score = speaker_pair_coordination(pair, conversation)
+		svm_vector = []
+		label = error
+		if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
+			label = high
+		if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
+			label = high
+		else:
+			label = low
+		svm_vector.append(label)
+		svm_vector.append(speaker_pair_coordination(pair, conversation))
+		allscores[pair] = svm_vector
+		# print allscores[pair]
+
+	return allscores
+
+
+# svm_vector = [0] * 10
+#     	label = error
+#     	if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
+#     		label = high
+#     	if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
+#     		label = high
+#     	else:
+#     		label = low
+#     	svm_vector.append(str(pair))
+#     	svm_vector.append(label)
+#     	print svm_vector
+    	# C_score = tuple(speaker_pair_coordination(pair, conversation))
+    	# svm_vector.append(C_score)
+    	# allscores[pair] = svm_vector
+
+
+
 #testing get_liwc_counts_from_utterances
 all_utterances, speaker_pairs = readdata.read_supreme_court()
 # test = all_utterances[2]['utterance']
 # print utils.get_liwc_counts_from_utterance(test)
 
-for pair, conversation in speaker_pairs.iteritems():
-	print speaker_pair_coordination(pair, conversation)
+# for pair, conversation in speaker_pairs.iteritems():
+# 	print speaker_pair_coordination(pair, conversation)
 # print speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')]
+# print all_utterances[42325]['utterance']
 # print utils.get_liwc_counts_from_utterance(all_utterances[42325]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42326]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42329]['utterance'])
@@ -154,8 +176,13 @@ for pair, conversation in speaker_pairs.iteritems():
 # print utils.get_liwc_counts_from_utterance(all_utterances[42343]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42344]['utterance'])
 
-# print stylistic_features(speaker_pairs)
-# print speaker_pair_coordination(('JUSTICE BREYER', 'MR. BAKER'))
+# # print stylistic_features(speaker_pairs)
+# print ('JUSTICE KENNEDY', 'MR. MCNULTY')
+# print speaker_pair_coordination(('JUSTICE KENNEDY', 'MR. MCNULTY'), speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')])
+# print (('JUSTICE BREYER', 'MR. BAKER'))
+# print speaker_pair_coordination(('JUSTICE BREYER', 'MR. BAKER'), speaker_pairs[('JUSTICE BREYER', 'MR. BAKER')])
+# print speaker_pairs
+print coordination_features(speaker_pairs)
 
 ######Sanity Check#########
 # Pair: ('JUSTICE KENNEDY', 'MR. MCNULTY')
