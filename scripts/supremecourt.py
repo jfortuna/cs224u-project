@@ -7,6 +7,14 @@ import readdata
 import utils
 import numpy
 
+#
+# using 1 to represent High Status Person
+# using -1 to represent Low Status Person
+#
+high = -1
+low = 1
+error = 0
+
 #TODO finish the bag of words stuff, 
 #see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation 
 #and http://scikit-learn.org/stable/auto_examples/document_classification_20newsgroups.html for more info
@@ -15,49 +23,38 @@ def bag_of_words():
 
 #TODO
 def stylistic_features(speaker_pairs):
-	#
-	# using 1 to represent High Status Person
-	# using -1 to represent Low Status Person
-	#
-	high = -1
-	low = 1
-	error = 0
+	allscores = {}
+	for pair, conversation in speaker_pairs.iteritems():
+		print pair + ": " + conversation
+		svm_vector = []
+    	label = error
+    	if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
+    		label = high
+    	if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
+    		label = high
+    	else:
+    		label = low
+    	svm_vector.append(label)
+    	C_score = tuple(speaker_pair_coordination(pair, conversation))
+    	svm_vector.append(C_score)
+    	allscores[pair] = svm_vector
 
-	for pair in speaker_pairs:
-		# svm_vector = []
-    	# label = error
-    	# if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
-    	# 	label = high
-    	# if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
-    	# 	label = high
-    	# else: label = low
-    	# svm_vector.append(label)
-		C_score = speaker_pair_coordination(pair)
-    	print pair
-    	print C_score
-    	# svm_vector.append(numpy.array(C_score))
-       	# print svm_vector
-
+	return allscores
 #TODO
 #Do Macro-Averaging C(b, A)
 def coordination_features():
     pass
 
 
-def speaker_pair_coordination(speaker_pair):
-
+def speaker_pair_coordination(speaker_pair, conversation):
+	print speaker_pair
 	b_speaker = speaker_pair[1]
 	a_target = speaker_pair[0]
-
-	print b_speaker
-	print a_target
 
 	b_coord_a_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 	b_exhibits_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 	a_exhibits_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 
-	conversation = speaker_pairs[speaker_pair]
-	print conversation
 	for exchange in conversation:
 		curr_coord = count_coordination(exchange)		
 		b_coord_a_counts = tuple(numpy.array(b_coord_a_counts) + numpy.array(curr_coord))
@@ -99,15 +96,21 @@ def count_exhibits_feature(utterance_pair, speaker):
 
 
 def calc_coordination(num_exchange, coordination_counts, b_exhibits_counts, a_exhibits_counts):
-	print coordination_counts
-	print b_exhibits_counts
-	print a_exhibits_counts
+	# print coordination_counts
+	# print b_exhibits_counts
+	# print a_exhibits_counts
 
-	coordination_prob = tuple(numpy.array(coordination_counts) / numpy.array(a_exhibits_counts));
+	coordination_prob = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+	for i in xrange(0, len(coordination_counts)):
+		if coordination_counts[i] == 0.0:
+			coordination_prob[i] = 0.0
+		else:
+			coordination_prob[i] = coordination_counts[i] / a_exhibits_counts[i];
+
+	# coordination_prob = tuple(numpy.array(coordination_counts) / numpy.array(a_exhibits_counts));
 	b_exhibits_prob = tuple(numpy.array(b_exhibits_counts) / num_exchange);
 
 	coord_prob = tuple(numpy.array(coordination_prob) - numpy.array(b_exhibits_prob))
-
 	# print coord_prob
 	return coord_prob
 
@@ -139,9 +142,8 @@ all_utterances, speaker_pairs = readdata.read_supreme_court()
 # test = all_utterances[2]['utterance']
 # print utils.get_liwc_counts_from_utterance(test)
 
-# for pair, conversation in speaker_pairs.iteritems():
-#     print pair
-
+for pair, conversation in speaker_pairs.iteritems():
+	print speaker_pair_coordination(pair, conversation)
 # print speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')]
 # print utils.get_liwc_counts_from_utterance(all_utterances[42325]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42326]['utterance'])
@@ -152,8 +154,8 @@ all_utterances, speaker_pairs = readdata.read_supreme_court()
 # print utils.get_liwc_counts_from_utterance(all_utterances[42343]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42344]['utterance'])
 
-stylistic_features(speaker_pairs)
-# print speaker_pair_coordination(('MR. MOODY', 'JUSTICE KENNEDY'))
+# print stylistic_features(speaker_pairs)
+# print speaker_pair_coordination(('JUSTICE BREYER', 'MR. BAKER'))
 
 ######Sanity Check#########
 # Pair: ('JUSTICE KENNEDY', 'MR. MCNULTY')
