@@ -51,15 +51,27 @@ def speaker_pair_coordination(speaker_pair):
 	b_speaker = speaker_pair[1]
 	a_target = speaker_pair[0]
 
-	b_coord_a_counts = (0,0,0,0,0,0,0,0)
+	b_coord_a_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+	b_exhibits_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+	a_exhibits_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+
 
 	conversation = speaker_pairs[speaker_pair]
 	for exchange in conversation:
-		curr_counts = count_coordination(exchange)
+		curr_coord = count_coordination(exchange)		
+		b_coord_a_counts = tuple(numpy.array(b_coord_a_counts) + numpy.array(curr_coord))
+		
+		b_curr_exhibits = count_exhibits_feature(exchange, 1)
+		a_curr_exhibits = count_exhibits_feature(exchange, 0)
 
-		b_coord_a_counts = tuple(numpy.array(b_coord_a_counts) + numpy.array(curr_counts))
+		b_exhibits_counts = tuple(numpy.array(b_exhibits_counts) + numpy.array(b_curr_exhibits))
+		a_exhibits_counts = tuple(numpy.array(a_exhibits_counts) + numpy.array(a_curr_exhibits))
 
-	return b_coord_a_counts
+	print b_coord_a_counts
+	print b_exhibits_counts
+	print a_exhibits_counts
+
+	print calc_coordination(len(conversation), b_coord_a_counts, b_exhibits_counts, a_exhibits_counts)
 
 
 def count_coordination(utterance_pair):
@@ -69,13 +81,34 @@ def count_coordination(utterance_pair):
 	b_utter_vec = utils.get_liwc_counts_from_utterance(b_utterance)
 	a_utter_vec = utils.get_liwc_counts_from_utterance(a_utterance)
 
-	coordination_counts = [0,0,0,0,0,0,0,0]
-	for marker_id in range(1,8):
+	coordination_counts = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+	for marker_id in range(0,8):
 		
 		if (a_utter_vec[marker_id] > 0) and (b_utter_vec[marker_id] > 0):
-			coordination_counts[marker_id] = coordination_counts[marker_id] + 1;
+			coordination_counts[marker_id] = coordination_counts[marker_id] + 1.0;
 
 	return coordination_counts
+
+def count_exhibits_feature(utterance_pair, speaker):
+	utterance = all_utterances[utterance_pair[speaker]]['utterance']
+	utter_vec = utils.get_liwc_counts_from_utterance(utterance)
+
+	exhibits_feature_counts = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+	for marker_id in range(0,8):
+		
+		if utter_vec[marker_id] > 0:
+			exhibits_feature_counts[marker_id] = exhibits_feature_counts[marker_id] + 1.0;
+	return exhibits_feature_counts
+
+
+def calc_coordination(num_exchange, coordination_counts, b_exhibits_counts, a_exhibits_counts):
+
+	coordination_prob = tuple(numpy.array(coordination_counts) / numpy.array(a_exhibits_counts));
+	b_exhibits_prob = tuple(numpy.array(b_exhibits_counts) / num_exchange);
+
+	coord_prob = tuple(numpy.array(coordination_prob) - numpy.array(b_exhibits_prob))
+
+	return coord_prob
 
 #testing get_liwc_counts_from_utterances
 all_utterances, speaker_pairs = readdata.read_supreme_court()
