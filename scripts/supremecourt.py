@@ -14,49 +14,50 @@ def bag_of_words():
     vectorizer = CountVectorizer()
 
 #TODO
-def stylistic_features():
-    # for a_speaker_pair in speaker_pairs:
-    	# thisPair_sum = stylistic_features_helper(speaker_pair)
-    pass
+def stylistic_features(speaker_pairs):
+	#
+	# using 1 to represent High Status Person
+	# using -1 to represent Low Status Person
+	#
+	high = -1
+	low = 1
+	error = 0
+
+	for pair in speaker_pairs:
+		# svm_vector = []
+    	# label = error
+    	# if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
+    	# 	label = high
+    	# if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
+    	# 	label = high
+    	# else: label = low
+    	# svm_vector.append(label)
+		C_score = speaker_pair_coordination(pair)
+    	print pair
+    	print C_score
+    	# svm_vector.append(numpy.array(C_score))
+       	# print svm_vector
+
 #TODO
 #Do Macro-Averaging C(b, A)
 def coordination_features():
     pass
 
 
-def speaker_pair_sum_vectors(speaker_pair):
-	b_a_sum= {}
-
-	b_speaker = speaker_pair[1]
-	a_target = speaker_pair[0]
-
-	b_a_sum[b_speaker] = (0,0,0,0,0,0,0,0)
-	b_a_sum[a_target] = (0,0,0,0,0,0,0,0)
-
-	conversation = speaker_pairs[speaker_pair]
-	for exchange in conversation:
-		b_utterance = all_utterances[exchange[1]]['utterance']
-		a_utterance = all_utterances[exchange[0]]['utterance']
-
-		b_utter_vec = utils.get_liwc_counts_from_utterance(b_utterance)
-		a_utter_vec = utils.get_liwc_counts_from_utterance(a_utterance)
-
-		b_a_sum[b_speaker] = tuple(numpy.array(b_a_sum[b_speaker]) + numpy.array(b_utter_vec)) 
-		b_a_sum[a_target] = tuple(numpy.array(b_a_sum[a_target]) + numpy.array(a_utter_vec)) 
-
-	return b_a_sum
-
 def speaker_pair_coordination(speaker_pair):
 
 	b_speaker = speaker_pair[1]
 	a_target = speaker_pair[0]
 
+	print b_speaker
+	print a_target
+
 	b_coord_a_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 	b_exhibits_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 	a_exhibits_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 
-
 	conversation = speaker_pairs[speaker_pair]
+	print conversation
 	for exchange in conversation:
 		curr_coord = count_coordination(exchange)		
 		b_coord_a_counts = tuple(numpy.array(b_coord_a_counts) + numpy.array(curr_coord))
@@ -67,11 +68,7 @@ def speaker_pair_coordination(speaker_pair):
 		b_exhibits_counts = tuple(numpy.array(b_exhibits_counts) + numpy.array(b_curr_exhibits))
 		a_exhibits_counts = tuple(numpy.array(a_exhibits_counts) + numpy.array(a_curr_exhibits))
 
-	print b_coord_a_counts
-	print b_exhibits_counts
-	print a_exhibits_counts
-
-	print calc_coordination(len(conversation), b_coord_a_counts, b_exhibits_counts, a_exhibits_counts)
+	return calc_coordination(len(conversation), b_coord_a_counts, b_exhibits_counts, a_exhibits_counts)
 
 
 def count_coordination(utterance_pair):
@@ -102,30 +99,80 @@ def count_exhibits_feature(utterance_pair, speaker):
 
 
 def calc_coordination(num_exchange, coordination_counts, b_exhibits_counts, a_exhibits_counts):
+	print coordination_counts
+	print b_exhibits_counts
+	print a_exhibits_counts
 
 	coordination_prob = tuple(numpy.array(coordination_counts) / numpy.array(a_exhibits_counts));
 	b_exhibits_prob = tuple(numpy.array(b_exhibits_counts) / num_exchange);
 
 	coord_prob = tuple(numpy.array(coordination_prob) - numpy.array(b_exhibits_prob))
 
+	# print coord_prob
 	return coord_prob
+
+
+def speaker_pair_sum_vectors(speaker_pair):
+	b_a_sum= {}
+
+	b_speaker = speaker_pair[1]
+	a_target = speaker_pair[0]
+
+	b_a_sum[b_speaker] = (0,0,0,0,0,0,0,0)
+	b_a_sum[a_target] = (0,0,0,0,0,0,0,0)
+
+	conversation = speaker_pairs[speaker_pair]
+	for exchange in conversation:
+		b_utterance = all_utterances[exchange[1]]['utterance']
+		a_utterance = all_utterances[exchange[0]]['utterance']
+
+		b_utter_vec = utils.get_liwc_counts_from_utterance(b_utterance)
+		a_utter_vec = utils.get_liwc_counts_from_utterance(a_utterance)
+
+		b_a_sum[b_speaker] = tuple(numpy.array(b_a_sum[b_speaker]) + numpy.array(b_utter_vec)) 
+		b_a_sum[a_target] = tuple(numpy.array(b_a_sum[a_target]) + numpy.array(a_utter_vec)) 
+
+	return b_a_sum
 
 #testing get_liwc_counts_from_utterances
 all_utterances, speaker_pairs = readdata.read_supreme_court()
 # test = all_utterances[2]['utterance']
 # print utils.get_liwc_counts_from_utterance(test)
 
-print speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')]
+# for pair, conversation in speaker_pairs.iteritems():
+#     print pair
 
-print utils.get_liwc_counts_from_utterance(all_utterances[42325]['utterance'])
-print utils.get_liwc_counts_from_utterance(all_utterances[42326]['utterance'])
-print utils.get_liwc_counts_from_utterance(all_utterances[42329]['utterance'])
-print utils.get_liwc_counts_from_utterance(all_utterances[42330]['utterance'])
-print utils.get_liwc_counts_from_utterance(all_utterances[42334]['utterance'])
-print utils.get_liwc_counts_from_utterance(all_utterances[42335]['utterance'])
-print utils.get_liwc_counts_from_utterance(all_utterances[42343]['utterance'])
-print utils.get_liwc_counts_from_utterance(all_utterances[42344]['utterance'])
+# print speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')]
+# print utils.get_liwc_counts_from_utterance(all_utterances[42325]['utterance'])
+# print utils.get_liwc_counts_from_utterance(all_utterances[42326]['utterance'])
+# print utils.get_liwc_counts_from_utterance(all_utterances[42329]['utterance'])
+# print utils.get_liwc_counts_from_utterance(all_utterances[42330]['utterance'])
+# print utils.get_liwc_counts_from_utterance(all_utterances[42334]['utterance'])
+# print utils.get_liwc_counts_from_utterance(all_utterances[42335]['utterance'])
+# print utils.get_liwc_counts_from_utterance(all_utterances[42343]['utterance'])
+# print utils.get_liwc_counts_from_utterance(all_utterances[42344]['utterance'])
 
-print ""
-print speaker_pair_coordination(('JUSTICE KENNEDY', 'MR. MCNULTY'))
-# print utils.get_liwc_counts_from_utterance(test)
+stylistic_features(speaker_pairs)
+# print speaker_pair_coordination(('MR. MOODY', 'JUSTICE KENNEDY'))
+
+######Sanity Check#########
+# Pair: ('JUSTICE KENNEDY', 'MR. MCNULTY')
+# 		(0, 1, 2, 2, 2, 1, 0, 0)
+# 		(1, 3, 2, 0, 1, 0, 2, 0)
+# 		(1, 2, 0, 1, 0, 0, 4, 1)
+# 		(0, 0, 0, 0, 1, 0, 0, 0)
+# 		(0, 1, 1, 0, 1, 0, 0, 0)
+# 		(3, 5, 2, 1, 1, 0, 2, 0)
+# 		(0, 0, 0, 0, 0, 0, 0, 0)
+# 		(2, 2, 0, 2, 1, 0, 2, 0)
+
+# cond: 	(0, 2, 2, 0, 2, 0, 0, 0)
+# exhib:	(3, 3, 2, 2, 4, 0, 3, 0)
+# p1cts:	(1, 3, 2, 2, 2, 1, 1, 0)
+
+# prob:
+
+# cond: 	(0,   2/3, 2/2, 0,   1,     0,   0, 0)
+# exhib:	(3/4, 3/4, 2/4, 2/4, 4/4, 0/4, 3/4, 0/4)
+
+# c:		(-3/4, -1/12, 1/2, -1/2, 0, 0, -1/4, 0)
