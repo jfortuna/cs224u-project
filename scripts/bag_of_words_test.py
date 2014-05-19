@@ -57,7 +57,7 @@ def bag_of_words():
     clf.fit(X_train, y_train)
     print "Testing"
     pred = clf.predict(X_test)
-    accuracy_score = metrics.zero_one_score(y_test, pred)
+    accuracy_score = metrics.accuracy_score(y_test, pred)
     classification_report = metrics.classification_report(y_test, pred)
     print accuracy_score
     print classification_report
