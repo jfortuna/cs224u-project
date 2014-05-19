@@ -6,14 +6,12 @@ import os
 import readdata
 import utils
 import numpy
+import supremecourt_utils
 
 #
 # using 1 to represent High Status Person
 # using -1 to represent Low Status Person
 #
-high = -1
-low = 1
-error = 0
 
 #TODO finish the bag of words stuff, 
 #see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation 
@@ -22,32 +20,38 @@ def bag_of_words():
     vectorizer = CountVectorizer()
 
 #TODO
-def stylistic_features(speaker_pairs):
+def stylistic_features(all_speaker_pairs):
+	#includes average length of all 
+	pass
+#TODO
+
+def coordination_features(all_speaker_pairs):
+	#TODO Macro-Averaging C(b, A)
+	print "Takes about ~2min to finish.....grab a cup of coffee"
 	allscores = {}
-	for pair, conversation in speaker_pairs.iteritems():
-		print pair + ": " + conversation
+	high = 10
+	low = 0
+	error = -1
+	for pair, conversation in all_speaker_pairs.iteritems():
+		# print str(pair) + ": " + str(conversation)
+		# score = speaker_pair_coordination(pair, conversation)
 		svm_vector = []
-    	label = error
-    	if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
-    		label = high
-    	if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
-    		label = high
-    	else:
-    		label = low
-    	svm_vector.append(label)
-    	C_score = tuple(speaker_pair_coordination(pair, conversation))
-    	svm_vector.append(C_score)
-    	allscores[pair] = svm_vector
+		label = error
+		if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
+			label = high
+		if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
+			label = high
+		else:
+			label = low
+		svm_vector.append(label)
+		svm_vector.append(speaker_pair_coordination(pair, conversation))
+		allscores[pair] = svm_vector
+		# print allscores[pair]
 
 	return allscores
-#TODO
-#Do Macro-Averaging C(b, A)
-def coordination_features():
-    pass
-
 
 def speaker_pair_coordination(speaker_pair, conversation):
-	print speaker_pair
+	# print speaker_pair
 	b_speaker = speaker_pair[1]
 	a_target = speaker_pair[0]
 
@@ -137,14 +141,25 @@ def speaker_pair_sum_vectors(speaker_pair):
 
 	return b_a_sum
 
+def write_to_file(filename_output, all_scores):
+	f = open(filename_output, 'wb')
+	for pair, score in all_scores.iteritems():
+		score_output = str(score[0]) + " " + str(list(score[1]))
+		# print score_output
+		f.write(score_output)
+		f.write('\n')
+	f.close()
+
+
 #testing get_liwc_counts_from_utterances
 all_utterances, speaker_pairs = readdata.read_supreme_court()
 # test = all_utterances[2]['utterance']
 # print utils.get_liwc_counts_from_utterance(test)
 
-for pair, conversation in speaker_pairs.iteritems():
-	print speaker_pair_coordination(pair, conversation)
+# for pair, conversation in speaker_pairs.iteritems():
+# 	print speaker_pair_coordination(pair, conversation)
 # print speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')]
+# print all_utterances[42325]['utterance']
 # print utils.get_liwc_counts_from_utterance(all_utterances[42325]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42326]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42329]['utterance'])
@@ -154,9 +169,24 @@ for pair, conversation in speaker_pairs.iteritems():
 # print utils.get_liwc_counts_from_utterance(all_utterances[42343]['utterance'])
 # print utils.get_liwc_counts_from_utterance(all_utterances[42344]['utterance'])
 
-# print stylistic_features(speaker_pairs)
-# print speaker_pair_coordination(('JUSTICE BREYER', 'MR. BAKER'))
-
+# # print stylistic_features(speaker_pairs)
+# print ('JUSTICE KENNEDY', 'MR. MCNULTY')
+# print speaker_pair_coordination(('JUSTICE KENNEDY', 'MR. MCNULTY'), speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')])
+# print (('JUSTICE BREYER', 'MR. BAKER'))
+# print speaker_pair_coordination(('JUSTICE BREYER', 'MR. BAKER'), speaker_pairs[('JUSTICE BREYER', 'MR. BAKER')])
+# print speaker_pairs
+supremecourt_scores = coordination_features(speaker_pairs)
+write_to_file('supremecourt_train', supremecourt_scores)
+# test_scores = {
+# ('MR. TRIBE', 'JUSTICE KENNEDY'): [1, (-0.072463768115942018, -0.0033444816053511683, -0.049689440993788858, -0.10559006211180127, 0.047101449275362306, -0.20158102766798414, 0.030100334448160626, -0.19130434782608696)], 
+# ('MR. HAGLUND', 'JUSTICE SCALIA'): [1, (-0.08333333333333337, 0.0, 0.0, 0.0, -0.16666666666666669, 0.083333333333333315, -0.08333333333333337, 0.25)], 
+# ('MR. PETRO', 'CHIEF JUSTICE REHNQUIST'): [1, (-0.25, -0.5, 0.0, -0.25, 0.25, -0.08333333333333337, 0.0, 0.0)], 
+# ('MS. HART', 'JUSTICE KENNEDY'): [-1, (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)], 
+# ('JUSTICE KENNEDY', 'MS. PERALES'): [1, (0.0, 0.13333333333333341, -0.08333333333333337, 0.5, -0.066666666666666652, 0.0, -0.033333333333333326, 0.16666666666666666)], 
+# ('MR. DREEBEN', 'JUSTICE ALITO'): [-1, (-0.023809523809523725, -0.023809523809523725, -0.057142857142857051, -0.11428571428571432, -0.023809523809523725, -0.057142857142857051, -0.023809523809523725, -0.057142857142857051)], 
+# ('MR. SALMONS', 'JUSTICE STEVENS'): [1, (0.042010502625656421, 0.011627906976744207, 0.097674418604651203, 0.10570824524312894, 0.009966777408637828, 0.37388193202146697, -0.050872093023255793, 0.013953488372093037)], 
+# ('MR. STEIKER', 'CHIEF JUSTICE ROBERTS'): [-1, (-0.015384615384615441, 0.070512820512820484, 0.061538461538461542, -0.067307692307692291, 0.030769230769230771, -0.18681318681318687, 0.030769230769230771, -0.23076923076923078)], ('MR. ROBBINS', 'JUSTICE STEVENS'): [1, (-0.012987012987012991, 0.056818181818181768, 0.030303030303030276, 0.11363636363636365, -0.060606060606060663, 0.030303030303030276, 0.056818181818181768, 0.39393939393939392)], ("JUSTICE O'CONNOR", 'MR. ZAGRANS'): [1, (-0.5, 0.0, -0.5, -0.5, 0.0, 0.0, 0.0, -0.5)], ('MR. JOHNSON', 'JUSTICE STEVENS'): [1, (-0.050000000000000044, -0.04166666666666663, -0.0069444444444444198, 0.0, -0.0625, 0.0625, 0.0056818181818182323, -0.25)], ('JUSTICE SOUTER', 'MR. FELDMAN'): [1, (0.044871794871794934, 0.05555555555555558, 0.31623931623931623, 0.098290598290598274, -0.045248868778280493, 0.055944055944055937, 0.20879120879120883, 0.11538461538461536)]
+# }
 ######Sanity Check#########
 # Pair: ('JUSTICE KENNEDY', 'MR. MCNULTY')
 # 		(0, 1, 2, 2, 2, 1, 0, 0)
