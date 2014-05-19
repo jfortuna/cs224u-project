@@ -29,25 +29,30 @@ def coordination_features(all_speaker_pairs):
 	#TODO Macro-Averaging C(b, A)
 	print "Takes about ~2min to finish.....grab a cup of coffee"
 	allscores = {}
-	high = 10
+	high = 1
 	low = 0
-	error = -1
+	error = 2
 	for pair, conversation in all_speaker_pairs.iteritems():
-		# print str(pair) + ": " + str(conversation)
-		# score = speaker_pair_coordination(pair, conversation)
 		svm_vector = []
 		label = error
-		if (pair[0].find('JUSTICE') > -1 and pair[1].find('JUSTICE') == -1):
-			label = high
-		if (pair[0].find('CHIEF') > -1 and pair[1].find('CHIEF') == -1):
-			label = high
-		else:
-			label = low
-		svm_vector.append(label)
-		svm_vector.append(speaker_pair_coordination(pair, conversation))
-		allscores[pair] = svm_vector
-		# print allscores[pair]
+		# print pair
+		# print conversation
+        print conversation[0][0] #first person
+        print conversation[0][1] #second person
+        x = all_utterances[conversation[0][0]]
+        y = all_utterances[conversation[0][1]]
+        utterance_x = utils.tokenize_utterance(x['utterance'])
+        utterance_y = utils.tokenize_utterance(y['utterance'])
 
+        if x['is_justice'] and not y['is_justice']: label = high
+        elif not x['is_justice'] and y['is_justice']: label = low
+        if abs(len(utterance_x) - len(utterance_y)) >= 20: label = error
+        
+        if label != error:
+    		svm_vector.append(label)
+    		svm_vector.append(speaker_pair_coordination(pair, conversation))
+    		allscores[pair] = svm_vector
+		# print allscores[pair]
 	return allscores
 
 def speaker_pair_coordination(speaker_pair, conversation):
