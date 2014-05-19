@@ -10,14 +10,13 @@ import utils
 import numpy
 
 #
-# using 1 to represent first person is of higher status than second person
-# using -1 to represent first person is of lower status than second person
+# using 0 to represent first person is of higher status than second person
+# using 1 to represent first person is of lower status than second person
 #
 high = 0
 low = 1
 error = 2
 
-#TODO finish the bag of words stuff, 
 #see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation 
 #and http://scikit-learn.org/stable/auto_examples/document_classification_20newsgroups.html for more info
 def bag_of_words():
