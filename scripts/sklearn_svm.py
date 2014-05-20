@@ -1,8 +1,13 @@
-import random
-import sklearn
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import svm
-from sklearn.datasets import load_svmlight_file
-import re
+from sklearn import cross_validation
+from sklearn import metrics
+
+import sys
+import os
+import readdata
+import utils
+import numpy
 
 markers = ["articles", "auxverbs", "conj", "highfreq_adverbs", "ipronouns", "ppronouns", "prep", "quant"]
 markers_int = ["1", "2", "3", "4", "5", "6", "7", "8"]
@@ -59,15 +64,32 @@ def svm_predict(train_data_file, test_data_file):
 	for test_data in test_data_list:
 		just_test = test_data[1:]
 		prediction = clf.predict(just_test)
-		print "sample: " + str(test_data)
-		print "prediction " + str(prediction)
+		# print "sample: " + str(test_data)
+		# print "prediction " + str(prediction)
 		if prediction > 0: numHigh += 1
 		if test_data[0] > 0: goldHigh +=1
 		numTotal += 1
 
-	accuracy = numHigh / goldHigh
-	print "SVM prediction: " + str(numHigh) + " out of " + str(numTotal) + " samples"
-	print "Accuracy: " + str(accuracy)
+def svm_cv(data, data_target):
+	data_train, data_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
+    print "Extracting features"
+    vectorizer = TfidfVectorizer(norm = 'l2')
+    X_train = vectorizer.fit_transform(data_train)
+    print len(vectorizer.get_feature_names())
+    X_test = vectorizer.transform(data_test)
+    print "Training"
+    clf = svm.LinearSVC()
+    clf.fit(X_train, y_train)
+    print "Testing"
+    pred = clf.predict(X_test)
+    accuracy_score = metrics.zero_one_score(y_test, pred)
+    classification_report = metrics.classification_report(y_test, pred)
+    print accuracy_score
+    print classification_report
+    numpy.set_printoptions(threshold='nan')
+    print y_test
+    print pred
+
 
 # def find_accuracy():
 
@@ -125,8 +147,11 @@ def svm_write_to_file(filename_output, vectors):
 
 # vectorarray = svm_read_from_file('testoutput')
 # print vectorarray
-svm_train('supremecourt_train', 'supremecourt_train')
-svm_predict('supremecourt_train.svmout', 'supremecourt_train')
+# svm_train('supremecourt_train', 'supremecourt_train')
+# svm_predict('supremecourt_train.svmout', 'supremecourt_train')
+
+
+
 # print ""
 # print vectorarray[0].split('[')
 # print vectorarray[1].split('[')
