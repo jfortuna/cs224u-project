@@ -1,12 +1,15 @@
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import svm
+from sklearn import cross_validation
+from sklearn import metrics
 
 import sys
 import os
 import readdata
 import utils
 import numpy
-import supremecourt_utils
+import collections
+
 
 #
 # using 1 to represent High Status Person
@@ -25,35 +28,102 @@ def stylistic_features(all_speaker_pairs):
 	pass
 #TODO
 
-def coordination_features(all_speaker_pairs):
-	#TODO Macro-Averaging C(b, A)
-	print "Takes about ~2min to finish.....grab a cup of coffee"
-	allscores = {}
+
+def coordination_features():
+	print "Takes about ~2 min to finish.....grab a cup of coffee"
+	print "............................................................."
+	print "raw_coord_scores"
+	supreme_raw = build_raw_score(speaker_pairs)
+
+	print "............................................................."
+	print "reformat into by speaker dictionary"
+	pair_dictionary = build_scores_by_person(supreme_raw)
+
+	print "............................................................."
+	print "with aggregate1"
+	final_score = compute_aggregate1(pair_dictionary)
+
+	print "............................................................."
+	print "adding labels"
+	supreme_data, supreme_label = generate_scores_labels(final_score)
+	return (supreme_data, supreme_label)
+
+
+def generate_scores_labels(scores):
+	final_scores = []
+	scores_labels = []
 	high = 1
 	low = 0
 	error = 2
-	for pair, conversation in all_speaker_pairs.iteritems():
-		svm_vector = []
+	for person, its_partners in scores.iteritems():
 		label = error
+		pair = (person, its_partners.iterkeys().next())
+		# print "      " + str(pair)
+		conversation = speaker_pairs[pair]
+		main_person = person
+		main_utterance = all_utterances[conversation[0][0]]
+		for speaking_to, pair_score in its_partners.iteritems():
+			speaking_to_utterance = all_utterances[conversation[0][1]]
+			if main_utterance['is_justice'] and not speaking_to_utterance['is_justice']:
+				label = high
+			elif not main_utterance['is_justice'] and speaking_to_utterance['is_justice']:
+				label = low
+			if pair_score[-1] != 'd' and label != error:
+				final_scores.append(pair_score)
+				scores_labels.append(label)
+
+	print "Total Pairs: " + str(len(scores_labels))
+	return(final_scores, scores_labels)
+
+
+def build_raw_score(all_speaker_pairs):
+	raw_coord_scores = {}
+	for pair, conversation in all_speaker_pairs.iteritems():
 		# print pair
 		# print conversation
-        print conversation[0][0] #first person
-        print conversation[0][1] #second person
-        x = all_utterances[conversation[0][0]]
-        y = all_utterances[conversation[0][1]]
-        utterance_x = utils.tokenize_utterance(x['utterance'])
-        utterance_y = utils.tokenize_utterance(y['utterance'])
+		curr_score = speaker_pair_coordination(pair, conversation)
+		raw_coord_scores[pair] = curr_score
+	# print raw_coord_scores
+	return raw_coord_scores
 
-        if x['is_justice'] and not y['is_justice']: label = high
-        elif not x['is_justice'] and y['is_justice']: label = low
-        if abs(len(utterance_x) - len(utterance_y)) >= 20: label = error
-        
-        if label != error:
-    		svm_vector.append(label)
-    		svm_vector.append(speaker_pair_coordination(pair, conversation))
-    		allscores[pair] = svm_vector
-		# print allscores[pair]
-	return allscores
+def sum_vectors(partners_dict):
+##input: dictionary of person->score
+	sum_vector = (0,0,0,0,0,0,0,0)
+
+	for person, score in partners_dict.iteritems():
+		sum_vector = tuple(numpy.array(sum_vector) + numpy.array(score))
+
+	return sum_vector
+
+def compute_aggregate1(raw_coord_scores):
+
+	for person, its_partners in raw_coord_scores.iteritems():
+		# print person
+		# for speaking_to, score in its_partners.iteritems():
+		# 	print "		" + speaking_to + " " + str(score)
+		person_sum = sum_vectors(its_partners)
+		# print person
+		# print person_sum
+		person_sum = list(person_sum)
+		average = 0.0
+		if all(i != 0.0 for i in person_sum):
+			# print sum(person_sum)
+			# print len(person_sum)
+			average = sum(person_sum)/len(person_sum)
+		else:
+			average = -20		
+		# print "average: " + str(average)
+		for speaking_to in its_partners:
+			scores = list(its_partners[speaking_to])
+			# print scores
+			if average != -20:
+				scores.append(average)
+			else:
+				scores.append('d')
+			its_partners[speaking_to] = scores  
+
+	coord_scores = raw_coord_scores
+	return coord_scores
 
 def speaker_pair_coordination(speaker_pair, conversation):
 	# print speaker_pair
@@ -65,7 +135,11 @@ def speaker_pair_coordination(speaker_pair, conversation):
 	a_exhibits_counts = (0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 
 	for exchange in conversation:
-		curr_coord = count_coordination(exchange)		
+		# print exchange
+		curr_coord = count_coordination(exchange)
+		if curr_coord == None:
+			# print "too long" 
+			continue	
 		b_coord_a_counts = tuple(numpy.array(b_coord_a_counts) + numpy.array(curr_coord))
 		
 		b_curr_exhibits = count_exhibits_feature(exchange, 1)
@@ -73,7 +147,9 @@ def speaker_pair_coordination(speaker_pair, conversation):
 
 		b_exhibits_counts = tuple(numpy.array(b_exhibits_counts) + numpy.array(b_curr_exhibits))
 		a_exhibits_counts = tuple(numpy.array(a_exhibits_counts) + numpy.array(a_curr_exhibits))
-
+	# print b_coord_a_counts 
+	# print b_exhibits_counts 
+	# print a_exhibits_counts
 	return calc_coordination(len(conversation), b_coord_a_counts, b_exhibits_counts, a_exhibits_counts)
 
 
@@ -84,6 +160,12 @@ def count_coordination(utterance_pair):
 	b_utter_vec = utils.get_liwc_counts_from_utterance(b_utterance)
 	a_utter_vec = utils.get_liwc_counts_from_utterance(a_utterance)
 
+	tokenized_b = utils.tokenize_utterance(b_utterance)
+	tokenized_a = utils.tokenize_utterance(a_utterance)
+
+	#throw this conversation out if difference in utterance length is greater than 20 
+	if abs(len(tokenized_b) - len(tokenized_a)) >=20: return None
+	
 	coordination_counts = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
 	for marker_id in range(0,8):
 		
@@ -105,10 +187,6 @@ def count_exhibits_feature(utterance_pair, speaker):
 
 
 def calc_coordination(num_exchange, coordination_counts, b_exhibits_counts, a_exhibits_counts):
-	# print coordination_counts
-	# print b_exhibits_counts
-	# print a_exhibits_counts
-
 	coordination_prob = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
 	for i in xrange(0, len(coordination_counts)):
 		if coordination_counts[i] == 0.0:
@@ -116,82 +194,87 @@ def calc_coordination(num_exchange, coordination_counts, b_exhibits_counts, a_ex
 		else:
 			coordination_prob[i] = coordination_counts[i] / a_exhibits_counts[i];
 
-	# coordination_prob = tuple(numpy.array(coordination_counts) / numpy.array(a_exhibits_counts));
 	b_exhibits_prob = tuple(numpy.array(b_exhibits_counts) / num_exchange);
 
 	coord_prob = tuple(numpy.array(coordination_prob) - numpy.array(b_exhibits_prob))
 	# print coord_prob
 	return coord_prob
 
+def build_scores_by_person(coord_raw_scores):
+	"""
+	{'JUSTICE STEVENS': {'MR.MCNULTY': 0.23423523, 
+						 'MR.MOODY': 0.23434324}}
 
-def speaker_pair_sum_vectors(speaker_pair):
-	b_a_sum= {}
+	"""
+	all_scores_person =  collections.defaultdict(lambda:{})
+	for pair, score in coord_raw_scores.iteritems():
+		person_x = pair[0]
+		person_y = pair[1]
+		# print person_x
+		# print person_y
+		all_scores_person[person_x][person_y] = score
+		# print all_scores_person
 
-	b_speaker = speaker_pair[1]
-	a_target = speaker_pair[0]
+	return all_scores_person
 
-	b_a_sum[b_speaker] = (0,0,0,0,0,0,0,0)
-	b_a_sum[a_target] = (0,0,0,0,0,0,0,0)
-
-	conversation = speaker_pairs[speaker_pair]
-	for exchange in conversation:
-		b_utterance = all_utterances[exchange[1]]['utterance']
-		a_utterance = all_utterances[exchange[0]]['utterance']
-
-		b_utter_vec = utils.get_liwc_counts_from_utterance(b_utterance)
-		a_utter_vec = utils.get_liwc_counts_from_utterance(a_utterance)
-
-		b_a_sum[b_speaker] = tuple(numpy.array(b_a_sum[b_speaker]) + numpy.array(b_utter_vec)) 
-		b_a_sum[a_target] = tuple(numpy.array(b_a_sum[a_target]) + numpy.array(a_utter_vec)) 
-
-	return b_a_sum
-
-def write_to_file(filename_output, all_scores):
-	f = open(filename_output, 'wb')
+def to_sklearn_format(all_scores):
+	data = []
+	data_target =[]
 	for pair, score in all_scores.iteritems():
-		score_output = str(score[0]) + " " + str(list(score[1]))
-		# print score_output
-		f.write(score_output)
-		f.write('\n')
-	f.close()
+		data.append(list(score[1]))
+		data_target.append(score[0])
+
+	return data, data_target
+
+def svm_cv(data, data_target):
+	X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
+	print "Training..."
+	clf = svm.LinearSVC()
+	clf.fit(X_train, y_train)
+	print "Testing..."
+	pred = clf.predict(X_test)
+	accuracy_score = metrics.accuracy_score(y_test, pred)
+	classification_report = metrics.classification_report(y_test, pred)
+	print accuracy_score
+	print classification_report
+	numpy.set_printoptions(threshold='nan')
+	print y_test
+	print pred
+
+# def write_to_file(filename_output, all_scores):
+# 	f = open(filename_output, 'wb')
+# 	for pair, score in all_scores.iteritems():
+# 		score_output = str(score[0]) + " " + str(list(score[1]))
+# 		# print score_output
+# 		f.write(score_output)
+# 		f.write('\n')
+# 	f.close()
 
 
 #testing get_liwc_counts_from_utterances
 all_utterances, speaker_pairs = readdata.read_supreme_court()
-# test = all_utterances[2]['utterance']
-# print utils.get_liwc_counts_from_utterance(test)
-
-# for pair, conversation in speaker_pairs.iteritems():
-# 	print speaker_pair_coordination(pair, conversation)
-# print speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')]
-# print all_utterances[42325]['utterance']
-# print utils.get_liwc_counts_from_utterance(all_utterances[42325]['utterance'])
-# print utils.get_liwc_counts_from_utterance(all_utterances[42326]['utterance'])
-# print utils.get_liwc_counts_from_utterance(all_utterances[42329]['utterance'])
-# print utils.get_liwc_counts_from_utterance(all_utterances[42330]['utterance'])
-# print utils.get_liwc_counts_from_utterance(all_utterances[42334]['utterance'])
-# print utils.get_liwc_counts_from_utterance(all_utterances[42335]['utterance'])
-# print utils.get_liwc_counts_from_utterance(all_utterances[42343]['utterance'])
-# print utils.get_liwc_counts_from_utterance(all_utterances[42344]['utterance'])
-
-# # print stylistic_features(speaker_pairs)
-# print ('JUSTICE KENNEDY', 'MR. MCNULTY')
-# print speaker_pair_coordination(('JUSTICE KENNEDY', 'MR. MCNULTY'), speaker_pairs[('JUSTICE KENNEDY', 'MR. MCNULTY')])
-# print (('JUSTICE BREYER', 'MR. BAKER'))
-# print speaker_pair_coordination(('JUSTICE BREYER', 'MR. BAKER'), speaker_pairs[('JUSTICE BREYER', 'MR. BAKER')])
 # print speaker_pairs
-supremecourt_scores = coordination_features(speaker_pairs)
-write_to_file('supremecourt_train', supremecourt_scores)
-# test_scores = {
-# ('MR. TRIBE', 'JUSTICE KENNEDY'): [1, (-0.072463768115942018, -0.0033444816053511683, -0.049689440993788858, -0.10559006211180127, 0.047101449275362306, -0.20158102766798414, 0.030100334448160626, -0.19130434782608696)], 
-# ('MR. HAGLUND', 'JUSTICE SCALIA'): [1, (-0.08333333333333337, 0.0, 0.0, 0.0, -0.16666666666666669, 0.083333333333333315, -0.08333333333333337, 0.25)], 
-# ('MR. PETRO', 'CHIEF JUSTICE REHNQUIST'): [1, (-0.25, -0.5, 0.0, -0.25, 0.25, -0.08333333333333337, 0.0, 0.0)], 
-# ('MS. HART', 'JUSTICE KENNEDY'): [-1, (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)], 
-# ('JUSTICE KENNEDY', 'MS. PERALES'): [1, (0.0, 0.13333333333333341, -0.08333333333333337, 0.5, -0.066666666666666652, 0.0, -0.033333333333333326, 0.16666666666666666)], 
-# ('MR. DREEBEN', 'JUSTICE ALITO'): [-1, (-0.023809523809523725, -0.023809523809523725, -0.057142857142857051, -0.11428571428571432, -0.023809523809523725, -0.057142857142857051, -0.023809523809523725, -0.057142857142857051)], 
-# ('MR. SALMONS', 'JUSTICE STEVENS'): [1, (0.042010502625656421, 0.011627906976744207, 0.097674418604651203, 0.10570824524312894, 0.009966777408637828, 0.37388193202146697, -0.050872093023255793, 0.013953488372093037)], 
-# ('MR. STEIKER', 'CHIEF JUSTICE ROBERTS'): [-1, (-0.015384615384615441, 0.070512820512820484, 0.061538461538461542, -0.067307692307692291, 0.030769230769230771, -0.18681318681318687, 0.030769230769230771, -0.23076923076923078)], ('MR. ROBBINS', 'JUSTICE STEVENS'): [1, (-0.012987012987012991, 0.056818181818181768, 0.030303030303030276, 0.11363636363636365, -0.060606060606060663, 0.030303030303030276, 0.056818181818181768, 0.39393939393939392)], ("JUSTICE O'CONNOR", 'MR. ZAGRANS'): [1, (-0.5, 0.0, -0.5, -0.5, 0.0, 0.0, 0.0, -0.5)], ('MR. JOHNSON', 'JUSTICE STEVENS'): [1, (-0.050000000000000044, -0.04166666666666663, -0.0069444444444444198, 0.0, -0.0625, 0.0625, 0.0056818181818182323, -0.25)], ('JUSTICE SOUTER', 'MR. FELDMAN'): [1, (0.044871794871794934, 0.05555555555555558, 0.31623931623931623, 0.098290598290598274, -0.045248868778280493, 0.055944055944055937, 0.20879120879120883, 0.11538461538461536)]
-# }
+print "............................................................."
+print ""
+print "Original # of Speaker Pairs: " + str(len(speaker_pairs))
+
+small_speaker_pairs ={
+('JUSTICE SOUTER', 'MR. COLEMAN'): [(5416, 5417), (5418, 5419), (5448, 5449), (5450, 5451), (5479, 5480), (5481, 5482), (5483, 5484), (5485, 5486), (5487, 5488), (5489, 5490), (40634, 40635), (40636, 40637), (40638, 40639), (40640, 40641)],
+("JUSTICE O'CONNOR", 'MS. NIELD'): [(25592, 25593), (25594, 25595), (25605, 25606), (25607, 25608), (25609, 25610), (25622, 25623), (25624, 25625), (25626, 25627), (25663, 25664), (25665, 25666), (25667, 25668), (25669, 25670), (25671, 25672), (25673, 25674), (25675, 25676), (25677, 25678), (25679, 25680), (25681, 25682), (25683, 25684)], 
+('MS. SULLIVAN', 'JUSTICE KENNEDY'): [(1130, 1131), (1132, 1133), (1134, 1135), (1182, 1183), (1184, 1185), (1191, 1192), (1193, 1194), (1195, 1196), (1203, 1204), (16531, 16532)], 
+('JUSTICE SOUTER', 'MR. ENGLERT'): [(32095, 32096), (32097, 32098)], 
+('CHIEF JUSTICE ROBERTS', 'CHIEF JUSTICE ROBERTS'): [(13618, 13619), (14215, 14216), (15065, 15066), (23364, 23365), (31246, 31247), (31770, 31771), (42356, 42357), (48454, 48455)], 
+('JUSTICE STEVENS', 'MR. KASNER'): [(17753, 17754), (17755, 17756), (17757, 17758), (17778, 17779), (17780, 17781), (17782, 17783), (17784, 17785), (17786, 17787), (17788, 17789), (17790, 17791), (17793, 17794), (18039, 18040), (18041, 18042)], 
+('MR. ZAS', 'JUSTICE SOUTER'): [(44175, 44176), (44177, 44178), (44179, 44180), (44181, 44182), (44183, 44184), (44185, 44186), (44187, 44188), (44197, 44198), (44201, 44202), (44204, 44205)], 
+('JUSTICE GINSBURG', 'MS. MADIGAN'): [(10032, 10033), (10111, 10112)], 
+('JUSTICE STEVENS', 'MR. JONES'): [(9461, 9462), (9463, 9464), (9465, 9466), (9467, 9468), (9479, 9480), (9481, 9482), (9483, 9484), (9488, 9489), (9490, 9491), (9492, 9493), (38807, 38808), (38809, 38810), (38811, 38812), (38813, 38814), (38821, 38822)]
+}
+
+supreme, supreme_target = coordination_features()
+
+svm_cv(supreme, supreme_target)
+
+
 ######Sanity Check#########
 # Pair: ('JUSTICE KENNEDY', 'MR. MCNULTY')
 # 		(0, 1, 2, 2, 2, 1, 0, 0)
