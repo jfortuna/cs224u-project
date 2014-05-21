@@ -22,7 +22,7 @@ def get_replies(conversations):
     for conversation in conversations:
         u_1 = all_utterances[conversation[0]]['utterance']
         u_2 = all_utterances[conversation[1]]['utterance']
-        if abs(len(utils.tokenize_utterance(u_1)) - len(utils.tokenize_utterance(u_2))) < 20:
+        if abs(len(u_1.split()) - len(u_2.split())) < 20:
             replies.append(u_2)
     return " ".join(replies)
 
