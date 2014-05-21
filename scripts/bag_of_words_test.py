@@ -40,29 +40,32 @@ def bag_of_words():
                 label = error
             conversation_x_y += " ".join(utterance_x) + " "
             conversation_x_y += " ".join(utterance_y) + " "
+
         if label != error:
             pairs.append(pair)
             data_target.append(label)
             data.append(conversation_x_y)
-    #print data_target
-    #print data
-    data_train, data_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
-    print "Extracting features"
-    vectorizer = TfidfVectorizer(norm = 'l2')
-    X_train = vectorizer.fit_transform(data_train)
-    print len(vectorizer.get_feature_names())
-    X_test = vectorizer.transform(data_test)
-    print "Training"
-    clf = svm.LinearSVC()
-    clf.fit(X_train, y_train)
-    print "Testing"
-    pred = clf.predict(X_test)
-    accuracy_score = metrics.zero_one_score(y_test, pred)
-    classification_report = metrics.classification_report(y_test, pred)
-    print accuracy_score
-    print classification_report
-    numpy.set_printoptions(threshold='nan')
-    print y_test
-    print pred
+    print data_target[0]
+    print ""
+    print data[0]
+
+    # data_train, data_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
+    # print "Extracting features"
+    # vectorizer = TfidfVectorizer(norm = 'l2')
+    # X_train = vectorizer.fit_transform(data_train)
+    # print len(vectorizer.get_feature_names())
+    # X_test = vectorizer.transform(data_test)
+    # print "Training"
+    # clf = svm.LinearSVC()
+    # clf.fit(X_train, y_train)
+    # print "Testing"
+    # pred = clf.predict(X_test)
+    # accuracy_score = metrics.zero_one_score(y_test, pred)
+    # classification_report = metrics.classification_report(y_test, pred)
+    # print accuracy_score
+    # print classification_report
+    # numpy.set_printoptions(threshold='nan')
+    # print y_test
+    # print pred
 
 bag_of_words()

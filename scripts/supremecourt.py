@@ -1,3 +1,4 @@
+from __future__ import division
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import svm
 from sklearn import cross_validation
@@ -11,29 +12,53 @@ import numpy
 import collections
 
 
-#
-# using 1 to represent High Status Person
-# using -1 to represent Low Status Person
-#
+high = 1
+low = 0
+error = 2
 
-#TODO finish the bag of words stuff, 
-#see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation 
-#and http://scikit-learn.org/stable/auto_examples/document_classification_20newsgroups.html for more info
 def bag_of_words():
-    vectorizer = CountVectorizer()
+	pass	
 
-#TODO
-def stylistic_features(all_speaker_pairs):
-	#includes average length of all 
-	pass
-#TODO
+
+def stylistic_features(all_speaker_pairs):	
+	data = []
+	data_target = []
+	for pair, conversation in speaker_pairs.iteritems():
+		this_vector = []
+		replies_x = get_replies(pair[0], conversation)
+		replies_y = get_replies(pair[1], conversation)
+
+		avg_x = len(utils.tokenize_utterance(replies_x)) / len(conversation) ##using future import above to have float number out of int division
+		avg_y = len(utils.tokenize_utterance(replies_y)) / len(conversation)
+	
+		x_marker_count = utils.get_liwc_counts_from_utterance(replies_x)
+		y_marker_count = utils.get_liwc_counts_from_utterance(replies_y)
+
+		this_vector.append(x_marker_count)
+		this_vector.append(avg_x)
+		this_vector.append(avg_y)
+		this_vector.append(y_marker_count)
+
+		data.append(this_vector)
+
+		x = all_utterances[conversation[0]]
+        y = all_utterances[conversation[1]]
+        if x['is_justice'] and not y['is_justice']:
+            label = high
+        elif not x['is_justice'] and y['is_justice']:
+            label = low
+
+        data_target.append(label);
+
+    return (data, data_target)
 
 
 def coordination_features():
 	print "Takes about ~2 min to finish.....grab a cup of coffee"
 	print "............................................................."
 	print "raw_coord_scores"
-	supreme_raw = build_raw_score(speaker_pairs)
+	supreme_raw = build_raw_score(small_speaker_pairs)
+	print supreme_raw
 
 	print "............................................................."
 	print "reformat into by speaker dictionary"
@@ -48,13 +73,9 @@ def coordination_features():
 	supreme_data, supreme_label = generate_scores_labels(final_score)
 	return (supreme_data, supreme_label)
 
-
 def generate_scores_labels(scores):
 	final_scores = []
 	scores_labels = []
-	high = 1
-	low = 0
-	error = 2
 	for person, its_partners in scores.iteritems():
 		label = error
 		pair = (person, its_partners.iterkeys().next())
@@ -226,8 +247,15 @@ def to_sklearn_format(all_scores):
 
 	return data, data_target
 
-def svm_cv(data, data_target):
+def svm_cv(data, data_target, extract_features):
 	X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
+	if (extract_features):
+		print "Extracting features"
+   	 	vectorizer = TfidfVectorizer(norm = 'l2')
+    	X_train = vectorizer.fit_transform(data_train)
+    	print len(vectorizer.get_feature_names())
+    	X_test = vectorizer.transform(data_test)
+
 	print "Training..."
 	clf = svm.LinearSVC()
 	clf.fit(X_train, y_train)
@@ -241,39 +269,25 @@ def svm_cv(data, data_target):
 	print y_test
 	print pred
 
-# def write_to_file(filename_output, all_scores):
-# 	f = open(filename_output, 'wb')
-# 	for pair, score in all_scores.iteritems():
-# 		score_output = str(score[0]) + " " + str(list(score[1]))
-# 		# print score_output
-# 		f.write(score_output)
-# 		f.write('\n')
-# 	f.close()
+# ========================== MAIN STARTS HERE ===================== #
 
-
-#testing get_liwc_counts_from_utterances
 all_utterances, speaker_pairs = readdata.read_supreme_court()
-# print speaker_pairs
 print "............................................................."
 print ""
 print "Original # of Speaker Pairs: " + str(len(speaker_pairs))
 
-small_speaker_pairs ={
-('JUSTICE SOUTER', 'MR. COLEMAN'): [(5416, 5417), (5418, 5419), (5448, 5449), (5450, 5451), (5479, 5480), (5481, 5482), (5483, 5484), (5485, 5486), (5487, 5488), (5489, 5490), (40634, 40635), (40636, 40637), (40638, 40639), (40640, 40641)],
-("JUSTICE O'CONNOR", 'MS. NIELD'): [(25592, 25593), (25594, 25595), (25605, 25606), (25607, 25608), (25609, 25610), (25622, 25623), (25624, 25625), (25626, 25627), (25663, 25664), (25665, 25666), (25667, 25668), (25669, 25670), (25671, 25672), (25673, 25674), (25675, 25676), (25677, 25678), (25679, 25680), (25681, 25682), (25683, 25684)], 
-('MS. SULLIVAN', 'JUSTICE KENNEDY'): [(1130, 1131), (1132, 1133), (1134, 1135), (1182, 1183), (1184, 1185), (1191, 1192), (1193, 1194), (1195, 1196), (1203, 1204), (16531, 16532)], 
-('JUSTICE SOUTER', 'MR. ENGLERT'): [(32095, 32096), (32097, 32098)], 
-('CHIEF JUSTICE ROBERTS', 'CHIEF JUSTICE ROBERTS'): [(13618, 13619), (14215, 14216), (15065, 15066), (23364, 23365), (31246, 31247), (31770, 31771), (42356, 42357), (48454, 48455)], 
-('JUSTICE STEVENS', 'MR. KASNER'): [(17753, 17754), (17755, 17756), (17757, 17758), (17778, 17779), (17780, 17781), (17782, 17783), (17784, 17785), (17786, 17787), (17788, 17789), (17790, 17791), (17793, 17794), (18039, 18040), (18041, 18042)], 
-('MR. ZAS', 'JUSTICE SOUTER'): [(44175, 44176), (44177, 44178), (44179, 44180), (44181, 44182), (44183, 44184), (44185, 44186), (44187, 44188), (44197, 44198), (44201, 44202), (44204, 44205)], 
-('JUSTICE GINSBURG', 'MS. MADIGAN'): [(10032, 10033), (10111, 10112)], 
-('JUSTICE STEVENS', 'MR. JONES'): [(9461, 9462), (9463, 9464), (9465, 9466), (9467, 9468), (9479, 9480), (9481, 9482), (9483, 9484), (9488, 9489), (9490, 9491), (9492, 9493), (38807, 38808), (38809, 38810), (38811, 38812), (38813, 38814), (38821, 38822)]
-}
+# supreme_cf, supreme_target_cf = coordination_features()
+# print "==========COORDINATION FEATURES================="
+# svm_cv(supreme, supreme_target, extract_features = false)
 
-supreme, supreme_target = coordination_features()
 
-svm_cv(supreme, supreme_target)
+# supreme_bow, supreme_target_bow = bag_of_words()
+# print "==========BAG OF WORDS FEATURES================="
+# svm_cv(supreme_bow, supreme_target_bow, extract_features = false)
 
+# supreme_bow, supreme_target_bow = stylistic_features()
+# print "==========STYLISTIC FEATURES================="
+# svm_cv(supreme_bow, supreme_target_bow)
 
 ######Sanity Check#########
 # Pair: ('JUSTICE KENNEDY', 'MR. MCNULTY')
@@ -296,3 +310,15 @@ svm_cv(supreme, supreme_target)
 # exhib:	(3/4, 3/4, 2/4, 2/4, 4/4, 0/4, 3/4, 0/4)
 
 # c:		(-3/4, -1/12, 1/2, -1/2, 0, 0, -1/4, 0)
+
+small_speaker_pairs ={
+('JUSTICE SOUTER', 'MR. COLEMAN'): [(5416, 5417), (5418, 5419), (5448, 5449), (5450, 5451), (5479, 5480), (5481, 5482), (5483, 5484), (5485, 5486), (5487, 5488), (5489, 5490), (40634, 40635), (40636, 40637), (40638, 40639), (40640, 40641)],
+("JUSTICE O'CONNOR", 'MS. NIELD'): [(25592, 25593), (25594, 25595), (25605, 25606), (25607, 25608), (25609, 25610), (25622, 25623), (25624, 25625), (25626, 25627), (25663, 25664), (25665, 25666), (25667, 25668), (25669, 25670), (25671, 25672), (25673, 25674), (25675, 25676), (25677, 25678), (25679, 25680), (25681, 25682), (25683, 25684)], 
+('MS. SULLIVAN', 'JUSTICE KENNEDY'): [(1130, 1131), (1132, 1133), (1134, 1135), (1182, 1183), (1184, 1185), (1191, 1192), (1193, 1194), (1195, 1196), (1203, 1204), (16531, 16532)], 
+('JUSTICE SOUTER', 'MR. ENGLERT'): [(32095, 32096), (32097, 32098)], 
+('CHIEF JUSTICE ROBERTS', 'CHIEF JUSTICE ROBERTS'): [(13618, 13619), (14215, 14216), (15065, 15066), (23364, 23365), (31246, 31247), (31770, 31771), (42356, 42357), (48454, 48455)], 
+('JUSTICE STEVENS', 'MR. KASNER'): [(17753, 17754), (17755, 17756), (17757, 17758), (17778, 17779), (17780, 17781), (17782, 17783), (17784, 17785), (17786, 17787), (17788, 17789), (17790, 17791), (17793, 17794), (18039, 18040), (18041, 18042)], 
+('MR. ZAS', 'JUSTICE SOUTER'): [(44175, 44176), (44177, 44178), (44179, 44180), (44181, 44182), (44183, 44184), (44185, 44186), (44187, 44188), (44197, 44198), (44201, 44202), (44204, 44205)], 
+('JUSTICE GINSBURG', 'MS. MADIGAN'): [(10032, 10033), (10111, 10112)], 
+('JUSTICE STEVENS', 'MR. JONES'): [(9461, 9462), (9463, 9464), (9465, 9466), (9467, 9468), (9479, 9480), (9481, 9482), (9483, 9484), (9488, 9489), (9490, 9491), (9492, 9493), (38807, 38808), (38809, 38810), (38811, 38812), (38813, 38814), (38821, 38822)]
+}
