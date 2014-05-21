@@ -29,7 +29,6 @@ def get_replies(conversations):
 #see http://scikit-learn.org/stable/modules/feature_extraction.html#the-bag-of-words-representation 
 #and http://scikit-learn.org/stable/auto_examples/document_classification_20newsgroups.html for more info
 def bag_of_words():
-    #all_utterances, speaker_pairs = readdata.read_supreme_court()
     data_target = []
     data = []
     pairs = []
@@ -37,34 +36,20 @@ def bag_of_words():
     #get pair and partner (by flipping pair), append to set of running ones I've checked already
     for pair, conversations in speaker_pairs.iteritems():
         if pair not in already_checked_pairs:
-            flipped_pair = (pair[1], pair[0])
             already_checked_pairs.add(pair)
-            if flipped_pair in speaker_pairs:
-                flipped_conversations = speaker_pairs[flipped_pair]
-                already_checked_pairs.add(flipped_pair)
             x_is_high = all_utterances[conversations[0][0]]['is_justice']
             y_is_high = all_utterances[conversations[0][1]]['is_justice']
             if x_is_high and not y_is_high:
                 label = high
-                if flipped_pair in speaker_pairs:
-                    flipped_label = low
             elif not x_is_high and y_is_high:
                 label = low
-                if flipped_pair in speaker_pairs:
-                    flipped_label = high
             else:
                 label = error
             if label != error:
                 conversation_x_y = get_replies(conversations)
-                conversation_x_y += " "
-                conversation_x_y += get_replies(flipped_conversations)
                 pairs.append(pair)
                 data_target.append(label)
                 data.append(conversation_x_y)
-                if flipped_pair in speaker_pairs:
-                    pairs.append(flipped_pair)
-                    data_target.append(flipped_label)
-                    data.append(conversation_x_y)
     #print data_target
     #print data
     data_train, data_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
