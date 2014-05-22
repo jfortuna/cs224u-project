@@ -7,7 +7,7 @@ import sys
 import os
 import readdata
 import utils
-import numpy
+import numpy as np
 
 #
 # using 0 to represent first person is of higher status than second person
@@ -56,7 +56,8 @@ def bag_of_words():
     print "Extracting features"
     vectorizer = TfidfVectorizer(norm = 'l2')
     X_train = vectorizer.fit_transform(data_train)
-    print len(vectorizer.get_feature_names())
+    feature_names = np.asarray(vectorizer.get_feature_names())
+    print len(feature_names)
     X_test = vectorizer.transform(data_test)
     print "Training"
     clf = svm.LinearSVC()
@@ -67,7 +68,7 @@ def bag_of_words():
     classification_report = metrics.classification_report(y_test, pred)
     print accuracy_score
     print classification_report
-    numpy.set_printoptions(threshold='nan')
+    np.set_printoptions(threshold='nan')
     print y_test
     print pred
 
