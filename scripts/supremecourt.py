@@ -20,38 +20,69 @@ def bag_of_words():
 	pass	
 
 
-def stylistic_features(all_speaker_pairs):	
+def stylistic_features():	
 	data = []
 	data_target = []
 	for pair, conversation in speaker_pairs.iteritems():
 		this_vector = []
-		replies_x = get_replies(pair[0], conversation)
-		replies_y = get_replies(pair[1], conversation)
+		replies_x = get_replies(conversation, "x")
+		replies_y = get_replies(conversation, "y")
 
+		# print pair
+		# # print conversation
+		# # print ""
+		# # print ""
+		# print "REPLIES_X " + replies_x
+
+		# print "REPLIES_Y " + replies_y
+		# print ""
+		# print ""
 		avg_x = len(utils.tokenize_utterance(replies_x)) / len(conversation) ##using future import above to have float number out of int division
 		avg_y = len(utils.tokenize_utterance(replies_y)) / len(conversation)
-	
+
 		x_marker_count = utils.get_liwc_counts_from_utterance(replies_x)
 		y_marker_count = utils.get_liwc_counts_from_utterance(replies_y)
 
-		this_vector.append(x_marker_count)
+		this_vector = this_vector + list(x_marker_count) + list(y_marker_count)
 		this_vector.append(avg_x)
 		this_vector.append(avg_y)
-		this_vector.append(y_marker_count)
 
-		data.append(this_vector)
+		x = all_utterances[conversation[0][0]]
+		y = all_utterances[conversation[0][1]]
+		if x['is_justice'] and not y['is_justice']: label = high
+		elif not x['is_justice'] and y['is_justice']: label = low
+		else: label = error
 
-		x = all_utterances[conversation[0]]
-        y = all_utterances[conversation[1]]
-        if x['is_justice'] and not y['is_justice']:
-            label = high
-        elif not x['is_justice'] and y['is_justice']:
-            label = low
+		if label != error:
+			data.append(this_vector)
+			data_target.append(label)
 
-        data_target.append(label);
+	# print "Data" + str(data)
+	# print "Target" + str(data_target)
+	return (data, data_target)
 
-    return (data, data_target)
+def get_replies(conversations, speaker):
+    replies_x = []
+    replies_y = []
+    for exchange in conversations:
+        u_1 = all_utterances[exchange[0]]['utterance']
+        u_2 = all_utterances[exchange[1]]['utterance']
+        if abs(len(utils.tokenize_utterance(u_1)) - len(utils.tokenize_utterance(u_2))) < 20:
+            replies_x.append(u_2)
+            replies_y.append(u_1)
 
+    if (speaker == "x"): return ' '.join(replies_x)
+    if (speaker == "y"): return ' '.join(replies_y)
+
+
+# def get_replies(conversations):
+#     replies = []
+#     for conversation in conversations:
+#         u_1 = all_utterances[conversation[0]]['utterance']
+#         u_2 = all_utterances[conversation[1]]['utterance']
+#         if abs(len(utils.tokenize_utterance(u_1)) - len(utils.tokenize_utterance(u_2))) < 20:
+#             replies.append(u_2)
+#     return " ".join(replies)
 
 def coordination_features():
 	print "Takes about ~2 min to finish.....grab a cup of coffee"
@@ -249,12 +280,12 @@ def to_sklearn_format(all_scores):
 
 def svm_cv(data, data_target, extract_features):
 	X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
-	if (extract_features):
-		print "Extracting features"
-   	 	vectorizer = TfidfVectorizer(norm = 'l2')
-    	X_train = vectorizer.fit_transform(data_train)
-    	print len(vectorizer.get_feature_names())
-    	X_test = vectorizer.transform(data_test)
+	# if (extract_features == True):
+	# 	print "Extracting features"
+ #   	 	vectorizer = TfidfVectorizer(norm = 'l2')
+ #    	X_train = vectorizer.fit_transform(data_train)
+ #    	print len(vectorizer.get_feature_names())
+ #    	X_test = vectorizer.transform(data_test)
 
 	print "Training..."
 	clf = svm.LinearSVC()
@@ -276,6 +307,13 @@ print "............................................................."
 print ""
 print "Original # of Speaker Pairs: " + str(len(speaker_pairs))
 
+print ("JUSTICE O'CONNOR", 'MS. ZIEVE')
+print all_utterances[16742]['utterance']
+print all_utterances[16743]['utterance']
+print all_utterances[16748]['utterance']
+print all_utterances[16749]['utterance']
+print all_utterances[16750]['utterance']
+print all_utterances[16751]['utterance']
 # supreme_cf, supreme_target_cf = coordination_features()
 # print "==========COORDINATION FEATURES================="
 # svm_cv(supreme, supreme_target, extract_features = false)
@@ -283,11 +321,9 @@ print "Original # of Speaker Pairs: " + str(len(speaker_pairs))
 
 # supreme_bow, supreme_target_bow = bag_of_words()
 # print "==========BAG OF WORDS FEATURES================="
-# svm_cv(supreme_bow, supreme_target_bow, extract_features = false)
+# svm_cv(supreme_bow, supreme_target_bow, extract_features = True)
 
-# supreme_bow, supreme_target_bow = stylistic_features()
-# print "==========STYLISTIC FEATURES================="
-# svm_cv(supreme_bow, supreme_target_bow)
+
 
 ######Sanity Check#########
 # Pair: ('JUSTICE KENNEDY', 'MR. MCNULTY')
@@ -322,3 +358,8 @@ small_speaker_pairs ={
 ('JUSTICE GINSBURG', 'MS. MADIGAN'): [(10032, 10033), (10111, 10112)], 
 ('JUSTICE STEVENS', 'MR. JONES'): [(9461, 9462), (9463, 9464), (9465, 9466), (9467, 9468), (9479, 9480), (9481, 9482), (9483, 9484), (9488, 9489), (9490, 9491), (9492, 9493), (38807, 38808), (38809, 38810), (38811, 38812), (38813, 38814), (38821, 38822)]
 }
+
+supreme_sf, supreme_target_sf = stylistic_features()
+print supreme_target_sf
+print "==========STYLISTIC FEATURES================="
+svm_cv(supreme_sf, supreme_target_sf, False)
