@@ -1,5 +1,13 @@
 import sys
 import os
+import json
+
+def read_house_hearing():
+    base_path = '../../data/house_hearing_transcripts/'
+    for filename in os.listdir(base_path):
+        with open(base_path + filename) as f:
+            data = json.load(f)
+    #TODO figure out how this data should be stored and return it
 
 def read_supreme_court():
     all_utterances = {}
