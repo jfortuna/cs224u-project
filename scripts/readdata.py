@@ -2,9 +2,10 @@ import sys
 import os
 import json
 
-def read_house_hearing():
+def read_house_hearing(dirname = '../../data/house_hearing_transcripts/'):
+    print "Reading House Hearing JSON Data....takes about 2 min"
     all_utterances = []
-    base_path = '../../data/house_hearing_transcripts/'
+    base_path = dirname
     for filename in os.listdir(base_path):
         hearing_utterances = {}
         with open(base_path + filename) as f:
@@ -20,6 +21,7 @@ def read_house_hearing():
                     hearing_utterances[speaker] = new_speeches
         all_utterances.append(hearing_utterances)
     print "House hearings data read"
+    # print all_utterances[100]['Sheila Jackson']
     return all_utterances
 
 def read_supreme_court():

@@ -1,7 +1,9 @@
 from __future__ import division
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn import svm
-from sklearn import cross_validation
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_selection import SelectKBest, chi2
+from sklearn.linear_model import LogisticRegression
+from sklearn.grid_search import GridSearchCV
+from sklearn.cross_validation import train_test_split, cross_val_score
 from sklearn import metrics
 
 import sys
@@ -18,6 +20,27 @@ error = 2
 
 def bag_of_words():
 	pass	
+
+
+def build_dataset(max_features=5000, min_df=1):
+    v = CountVectorizer(ngram_range=(1,1), min_df=min_df)
+    data_target = []
+    data = []
+    for pair, conversations in speaker_pairs.iteritems():
+        x_is_high = all_utterances[conversations[0][0]]['is_justice']
+        y_is_high = all_utterances[conversations[0][1]]['is_justice']
+        if x_is_high and not y_is_high:
+            label = high
+        elif not x_is_high and y_is_high:
+            label = low
+        else:
+            label = error
+        if label != error:
+            conversation_x_y = get_replies(conversations)
+            data_target.append(label)
+            data.append(conversation_x_y)
+    X = v.fit_transform(data)
+    return {'features': X, 'labels': np.array(data_target), 'featurenames': v.get_feature_names()}
 
 
 def stylistic_features():	
@@ -61,18 +84,14 @@ def stylistic_features():
 	# print "Target" + str(data_target)
 	return (data, data_target)
 
-def get_replies(conversations, speaker):
-    replies_x = []
-    replies_y = []
-    for exchange in conversations:
-        u_1 = all_utterances[exchange[0]]['utterance']
-        u_2 = all_utterances[exchange[1]]['utterance']
-        if abs(len(utils.tokenize_utterance(u_1)) - len(utils.tokenize_utterance(u_2))) < 20:
-            replies_x.append(u_2)
-            replies_y.append(u_1)
-
-    if (speaker == "x"): return ' '.join(replies_x)
-    if (speaker == "y"): return ' '.join(replies_y)
+def get_replies(conversations):
+    replies = []
+    for conversation in conversations:
+        u_1 = all_utterances[conversation[0]]['utterance']
+        u_2 = all_utterances[conversation[1]]['utterance']
+        if abs(len(u_1.split()) - len(u_2.split())) < 20:
+            replies.append(u_2)
+    return " ".join(replies)
 
 
 # def get_replies(conversations):

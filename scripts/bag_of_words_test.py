@@ -19,7 +19,7 @@ high = 0
 low = 1
 error = 2
 
-def get_replies(conversations, speaker):
+def get_replies(conversations):
     replies = []
     for conversation in conversations:
         u_1 = all_utterances[conversation[0]]['utterance']
