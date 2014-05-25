@@ -31,19 +31,27 @@ def pair_rank(raw_vectors):
         for combo in combos:
             person1 = str(combo[0])
             person2 = str(combo[1])
-            print person1, person2
+            # print person1, person2
             new_instance = hearing[person1] + hearing[person2]
             year = congress_year[index]
-            print year
+            # print year
             rel_rank = rank_lookup(person1, person2, year)
-            if rel_rank!= -1: 
-                pair_target = (rel_rank)
+            if rel_rank!= -1 and rel_rank != None:
+                pair_target.append(rel_rank)
                 pair_data.append(new_instance)
 
+    # print pair_data
+    print pair_target
     return (pair_data, pair_target)
 
 
 def rank_lookup(x,y, year):
+    try:
+        all_rank[year][x]
+        all_rank[year][y]
+    except KeyError:
+        print "No Person: " +  x + " or " + y
+        return -1
     if (all_rank[year][x] > all_rank[year][y]): return 1
     if (all_rank[year][x] < all_rank[year][y]): return 0
     else: -1
@@ -95,7 +103,7 @@ house_utterances, congress_year = readdata.read_house_hearing('../../data/small_
 all_vectors = build_vectors()
 
 # print all_rank
-print pair_rank(all_vectors)
+pair_rank(all_vectors)
 
 # all_vectors = build_vectors()
 # a = pair_rank(all_vectors)
