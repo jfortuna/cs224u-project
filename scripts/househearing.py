@@ -21,23 +21,30 @@ def build_vectors():
     return all_vectors
 
 
-def pair_rank(raw_vectors, year_list):
+def pair_rank(raw_vectors):
     pair_data = []
     pair_target = []
-    for hearing in raw_vectors:
+    for index, hearing in enumerate(raw_vectors):
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
-            person1 = combo[0]
-            person2 = combo[1]
+            person1 = str(combo[0])
+            person2 = str(combo[1])
+            print person1, person2
             new_instance = hearing[person1] + hearing[person2]
-            pair_data.append(new_instance)
+            year = congress_year[index]
+            print year
             rel_rank = rank_lookup(person1, person2, year)
-            if rel_rank!= 0: pair_target.append(rel_rank)
+            if rel_rank!= -1: 
+                pair_target = (rel_rank)
+                pair_data.append(new_instance)
+
+    return (pair_data, pair_target)
 
 
-# def rank_lookup(x,y, year):
-
-
+def rank_lookup(x,y, year):
+    if (all_rank[year][x] > all_rank[year][y]): return 1
+    if (all_rank[year][x] < all_rank[year][y]): return 0
+    else: -1
 
 def read_rank_data(dirname = 'rank/'):
     all_rank = collections.defaultdict(lambda:{})
@@ -51,12 +58,12 @@ def read_rank_data(dirname = 'rank/'):
     return all_rank
 
 
-
-
 all_rank = read_rank_data()
 house_utterances, congress_year = readdata.read_house_hearing('../../data/small_house/')
+all_vectors = build_vectors()
 
-print congress_year
+# print all_rank
+print pair_rank(all_vectors)
 
 # all_vectors = build_vectors()
 # a = pair_rank(all_vectors)
