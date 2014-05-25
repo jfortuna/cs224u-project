@@ -66,8 +66,6 @@ class UTF8Recoder:
     def __init__(self, f, encoding):
         self.reader = codecs.getreader(encoding)(f)
 
-<<<<<<< HEAD
-=======
     def __iter__(self):
         return self
 
@@ -92,7 +90,6 @@ class UnicodeReader:
         return self
 
 
->>>>>>> c25a2b4f20e6d3d4945774f1a0384274ce41d2ee
 all_rank = read_rank_data()
 house_utterances, congress_year = readdata.read_house_hearing('../../data/small_house/')
 all_vectors = build_vectors()
