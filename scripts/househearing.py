@@ -2,7 +2,9 @@ import readdata
 import utils
 from operator import add
 from itertools import combinations
-
+import csv
+import collections
+import os
 
 def build_vectors():
     all_vectors = []
@@ -19,7 +21,7 @@ def build_vectors():
     return all_vectors
 
 
-def pair_rank(raw_vectors):
+def pair_rank(raw_vectors, year_list):
     pair_data = []
     pair_target = []
     for hearing in raw_vectors:
@@ -33,11 +35,32 @@ def pair_rank(raw_vectors):
             if rel_rank!= 0: pair_target.append(rel_rank)
 
 
-def rank_lookup(x,y, year):
-    
+# def rank_lookup(x,y, year):
 
 
-house_utterances = readdata.read_house_hearing('../../data/small_house/')
 
-all_vectors = build_vectors()
-a = pair_rank(all_vectors)
+def read_rank_data(dirname = 'rank/'):
+    all_rank = collections.defaultdict(lambda:{})
+    base_path = dirname
+    for filename in os.listdir(base_path):
+        year = filename[:4]
+        with open(base_path + filename) as csvfile:
+            reader = csv.reader(csvfile, delimiter = ",")
+            for row in reader:
+                all_rank[year][row[1]] = row[0]
+    return all_rank
+
+
+
+
+all_rank = read_rank_data()
+house_utterances, congress_year = readdata.read_house_hearing('../../data/small_house/')
+
+print congress_year
+
+# all_vectors = build_vectors()
+# a = pair_rank(all_vectors)
+
+# all_rank = read_rank_data()
+# print all_rank['2011']['Bob Latta']
+# print all_rank['2011']

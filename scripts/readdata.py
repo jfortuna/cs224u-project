@@ -5,11 +5,13 @@ import json
 def read_house_hearing(dirname = '../../data/house_hearing_transcripts/'):
     print "Reading House Hearing JSON Data....takes about 2 min"
     all_utterances = []
+    congress_year = []
     base_path = dirname
     for filename in os.listdir(base_path):
         hearing_utterances = {}
         with open(base_path + filename) as f:
             data = json.load(f)
+            congress_year.append(data['date_aired'][-4:])
             for utterance in data['transcript']:
                 speaker = utterance['speaker']['name']['first'] + ' ' + utterance['speaker']['name']['last']
                 speech = utterance['speech']
@@ -22,7 +24,7 @@ def read_house_hearing(dirname = '../../data/house_hearing_transcripts/'):
         all_utterances.append(hearing_utterances)
     print "House hearings data read"
     # print all_utterances[100]['Sheila Jackson']
-    return all_utterances
+    return (all_utterances, congress_year)
 
 def read_supreme_court():
     all_utterances = {}
