@@ -1,5 +1,25 @@
 import sys
 import os
+import json
+
+def read_house_hearing():
+    all_utterances = {}
+    base_path = '../../data/house_hearing_transcripts/'
+    for filename in os.listdir(base_path):
+        with open(base_path + filename) as f:
+            data = json.load(f)
+            for utterance in data['transcript']:
+                speaker = utterance['speaker']['name']['first'] + ' ' + utterance['speaker']['name']['last']
+                speech = utterance['speech']
+                if speaker not in all_utterances:
+                    all_utterances[speaker] = [speech]
+                else:
+                    new_speeches = all_utterances[speaker]
+                    new_speeches.append(speech)
+                    all_utterances[speaker] = new_speeches
+    print "House hearings data read"
+    return all_utterances
+    #TODO figure out how this data should be stored and return it
 
 def read_supreme_court():
     all_utterances = {}
