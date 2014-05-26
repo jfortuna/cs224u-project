@@ -33,7 +33,7 @@ def pair_rank(raw_vectors):
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
             year = congress_year[index]
-            # print year
+            print year
             person1 = combo[0]
             # print combo
             person2 = combo[1]
