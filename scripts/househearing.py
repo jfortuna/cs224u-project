@@ -1,27 +1,26 @@
 import readdata
 import utils
-from operator import add
 from itertools import combinations
 import csv
 import collections
 import os
 import codecs
 import cStringIO
+from sklearn import cross_validation
+from sklearn import metrics
+from sklearn import svm
+import numpy as np
 import sys
-
 
 
 def build_vectors():
     all_vectors = []
-    for hearing in house_utterances:
+    for index, hearing in enumerate(house_utterances):
+        print 'Building vectors for hearing', index
         hearing_map = {}
-        for speaker, list_of_utterances in hearing.iteritems():
-            hearing_map[speaker] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-            for utterance in list_of_utterances:
-                # print utterance
-                new_vector = utils.get_liwc_counts_from_utterance(utterance)
-                # print new_vector
-                hearing_map[speaker] = map(add,  hearing_map[speaker], list(new_vector))
+        for speaker, utterances in hearing.iteritems():
+            combined_utterances = ' '.join(utterances)
+            hearing_map[speaker] = list(utils.get_liwc_counts_from_utterance(combined_utterances))
         all_vectors.append(hearing_map)
     return all_vectors
 
@@ -30,6 +29,7 @@ def pair_rank(raw_vectors):
     pair_data = []
     pair_target = []
     for index, hearing in enumerate(raw_vectors):
+        print 'Calculating ranks for hearing', index
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
             year = congress_year[index]
@@ -80,6 +80,21 @@ def read_rank_data(dirname = 'rank/'):
                 all_rank[year][row[1]] = row[0]
     return all_rank
 
+def svm_cv(data, data_target):
+	X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
+	print "Training..."
+	clf = svm.LinearSVC()
+	clf.fit(X_train, y_train)
+	print "Testing..."
+	pred = clf.predict(X_test)
+	accuracy_score = metrics.accuracy_score(y_test, pred)
+	classification_report = metrics.classification_report(y_test, pred)
+	print accuracy_score
+	print classification_report
+	np.set_printoptions(threshold='nan')
+	#print y_test
+	#print pred
+
 class UTF8Recoder:
     """
     Iterator that reads an encoded stream and reencodes the input to UTF-8
@@ -115,7 +130,8 @@ house_utterances, congress_year = readdata.read_house_hearing()
 all_vectors = build_vectors()
 
 # print all_rank
-pair_rank(all_vectors)
+data, target = pair_rank(all_vectors)
+svm_cv(data, target)
 
 # all_vectors = build_vectors()
 # a = pair_rank(all_vectors)
