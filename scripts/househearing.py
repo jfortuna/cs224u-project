@@ -66,6 +66,8 @@ def rank_lookup(x,y, year):
             keyerrors.add(x)
             return -1;
     try:
+        all_rank[year][y]
+    except KeyError:
         if not y in no_vote_members:
             keyerrors.add(y)
             return -1;
