@@ -13,7 +13,7 @@ def read_house_hearing(dirname = '../../data/house_hearing_transcripts/'):
             data = json.load(f)
             year = data['date_aired'][-4:]
             # print year
-            if year.find('2012') < 0: 
+            if year.find('2011') < 0: 
                 # print "skipping " + year
                 continue
             else:
