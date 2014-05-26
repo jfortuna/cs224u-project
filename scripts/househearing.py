@@ -7,6 +7,9 @@ import collections
 import os
 import codecs
 import cStringIO
+import sys
+
+
 
 def build_vectors():
     all_vectors = []
@@ -29,10 +32,15 @@ def pair_rank(raw_vectors):
     for index, hearing in enumerate(raw_vectors):
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
-            person1 = str(combo[0])
-            person2 = str(combo[1])
+            year = congress_year[index]
+            print year
+            person1 = combo[0]
+            print combo
+            person2 = combo[1]
             # print person1, person2
+
             new_instance = hearing[person1] + hearing[person2]
+            # print index
             year = congress_year[index]
             # print year
             rel_rank = rank_lookup(person1, person2, year)
@@ -41,16 +49,21 @@ def pair_rank(raw_vectors):
                 pair_data.append(new_instance)
 
     # print pair_data
-    print pair_target
+    # print pair_target
     return (pair_data, pair_target)
 
 
 def rank_lookup(x,y, year):
+    no_vote_members = set(['Donna Christensen', 'Gregorio Sablan', 'Pedro Pierluisi', 
+                        'Eleanor Norton', 'Eni Faleomavaega', 'Madeleine Bordallo'])
+    if x.encode('utf-8').find('Ra\xc3\xbal Grijalva') > -1: x ='Raul Grijalva'
+    if y.encode('utf-8').find('Ra\xc3\xbal Grijalva') > -1: y ='Raul Grijalva'    
     try:
         all_rank[year][x]
         all_rank[year][y]
     except KeyError:
-        print "No Person: " +  x + " or " + y
+        if not x in no_vote_members and not y in no_vote_members:
+            print "No Person: " +  x + " or " + y
         return -1
     if (all_rank[year][x] > all_rank[year][y]): return 1
     if (all_rank[year][x] < all_rank[year][y]): return 0
@@ -97,9 +110,8 @@ class UnicodeReader:
     def __iter__(self):
         return self
 
-
 all_rank = read_rank_data()
-house_utterances, congress_year = readdata.read_house_hearing('../../data/small_house/')
+house_utterances, congress_year = readdata.read_house_hearing()
 all_vectors = build_vectors()
 
 # print all_rank

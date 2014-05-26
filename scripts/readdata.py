@@ -11,6 +11,9 @@ def read_house_hearing(dirname = '../../data/house_hearing_transcripts/'):
         hearing_utterances = {}
         with open(base_path + filename) as f:
             data = json.load(f)
+            year = data['date_aired'][-4:]
+            print year
+            if year.find('2012') < 0: break
             congress_year.append(data['date_aired'][-4:])
             for utterance in data['transcript']:
                 speaker = utterance['speaker']['name']['first'] + ' ' + utterance['speaker']['name']['last']
