@@ -14,7 +14,7 @@ def read_house_hearing(dirname = '../../data/house_hearing_transcripts/'):
             year = data['date_aired'][-4:]
             # print year
             if year.find('2012') < 0: 
-                print "skipping " + year
+                # print "skipping " + year
                 continue
             else:
                 congress_year.append(data['date_aired'][-4:])

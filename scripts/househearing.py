@@ -14,9 +14,10 @@ import sys
 
 
 def build_vectors():
+    print len(house_utterances)
     all_vectors = []
     for index, hearing in enumerate(house_utterances):
-        print 'Building vectors for hearing', index
+        # print 'Building vectors for hearing', index
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
@@ -29,11 +30,11 @@ def pair_rank(raw_vectors):
     pair_data = []
     pair_target = []
     for index, hearing in enumerate(raw_vectors):
-        print 'Calculating ranks for hearing', index
+        # print 'Calculating ranks for hearing', index
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
             year = congress_year[index]
-            print year
+            # print year
             person1 = combo[0]
             # print combo
             person2 = combo[1]
@@ -60,11 +61,14 @@ def rank_lookup(x,y, year):
     if y.encode('utf-8').find('Ra\xc3\xbal Grijalva') > -1: y ='Raul Grijalva'    
     try:
         all_rank[year][x]
-        all_rank[year][y]
     except KeyError:
-        if not x in no_vote_members and not y in no_vote_members:
-            print "No Person: " +  x + " or " + y
-        return -1
+        if not x in no_vote_members:
+            keyerrors.add(x)
+            return -1;
+    try:
+        if not y in no_vote_members:
+            keyerrors.add(y)
+            return -1;
     if (all_rank[year][x] > all_rank[year][y]): return 1
     if (all_rank[year][x] < all_rank[year][y]): return 0
     else: -1
@@ -130,8 +134,10 @@ house_utterances, congress_year = readdata.read_house_hearing()
 all_vectors = build_vectors()
 
 # print all_rank
+keyerrors = set([])   
 data, target = pair_rank(all_vectors)
-svm_cv(data, target)
+print keyerrors
+# svm_cv(data, target)
 
 # all_vectors = build_vectors()
 # a = pair_rank(all_vectors)
