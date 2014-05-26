@@ -15,10 +15,9 @@ import sys
 sys.stdout = codecs.getwriter('utf-8')(sys.__stdout__)
 
 def build_vectors():
-    print len(house_utterances)
     all_vectors = []
     for index, hearing in enumerate(house_utterances):
-        # print 'Building vectors for hearing', index
+        print 'Building vectors for hearing', index
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
@@ -31,7 +30,7 @@ def pair_rank(raw_vectors):
     pair_data = []
     pair_target = []
     for index, hearing in enumerate(raw_vectors):
-        # print 'Calculating ranks for hearing', index
+        print 'Calculating ranks for hearing', index
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
             year = congress_year[index]
@@ -82,7 +81,6 @@ def read_rank_data(dirname = 'rank/'):
             reader = UnicodeReader(csvfile, delimiter = ",")
             for row in reader:
                 all_rank[year][row[1]] = row[0]
-                print row[1]
     return all_rank
 
 def svm_cv(data, data_target):
@@ -131,18 +129,12 @@ class UnicodeReader:
         return self
 
 all_rank = read_rank_data()
-house_utterances, congress_year = readdata.read_house_hearing(dirname='../../data/small_house/')
+# house_utterances, congress_year = readdata.read_house_hearing(dirname='../../data/small_house/')
+house_utterances, congress_year = readdata.read_house_hearing()
 all_vectors = build_vectors()
 
 # print all_rank
 keyerrors = set([])   
 data, target = pair_rank(all_vectors)
-print keyerrors
-# svm_cv(data, target)
-
-# all_vectors = build_vectors()
-# a = pair_rank(all_vectors)
-
-# all_rank = read_rank_data()
-# print all_rank['2011']['Bob Latta']
-# print all_rank['2011']
+# print keyerrors
+svm_cv(data, target)

@@ -13,24 +13,18 @@ def read_house_hearing(dirname = '../../data/house_hearing_transcripts/'):
         with codecs.open(base_path + filename, encoding='utf-8') as f:
             data = json.load(f)
             year = data['date_aired'][-4:]
-            # print year
-            if year.find('2012') < 0: 
-                # print "skipping " + year
-                continue
-            else:
-                congress_year.append(data['date_aired'][-4:])
-                for utterance in data['transcript']:
-                    speaker = utterance['speaker']['name']['first'] + ' ' + utterance['speaker']['name']['last']
-                    speech = utterance['speech']
-                    if speaker not in hearing_utterances:
-                        hearing_utterances[speaker] = [speech]
-                    else:
-                        new_speeches = hearing_utterances[speaker]
-                        new_speeches.append(speech)
-                        hearing_utterances[speaker] = new_speeches
+            congress_year.append(data['date_aired'][-4:])
+            for utterance in data['transcript']:
+                speaker = utterance['speaker']['name']['first'] + ' ' + utterance['speaker']['name']['last']
+                speech = utterance['speech']
+                if speaker not in hearing_utterances:
+                    hearing_utterances[speaker] = [speech]
+                else:
+                    new_speeches = hearing_utterances[speaker]
+                    new_speeches.append(speech)
+                    hearing_utterances[speaker] = new_speeches
         all_utterances.append(hearing_utterances)
     print "House hearings data read"
-    # print all_utterances[100]['Sheila Jackson']
     return (all_utterances, congress_year)
 
 def read_supreme_court():
