@@ -12,6 +12,7 @@ from sklearn import svm
 import numpy as np
 import sys
 
+sys.stdout = codecs.getwriter('utf-8')(sys.__stdout__)
 
 def build_vectors():
     all_vectors = []
@@ -54,10 +55,7 @@ def pair_rank(raw_vectors):
 
 
 def rank_lookup(x,y, year):
-    no_vote_members = set(['Donna Christensen', 'Gregorio Sablan', 'Pedro Pierluisi', 
-                        'Eleanor Norton', 'Eni Faleomavaega', 'Madeleine Bordallo'])
-    if x.encode('utf-8').find('Ra\xc3\xbal Grijalva') > -1: x ='Raul Grijalva'
-    if y.encode('utf-8').find('Ra\xc3\xbal Grijalva') > -1: y ='Raul Grijalva'    
+    no_vote_members = set(['Donna Christensen', 'Gregorio Sablan', 'Pedro Pierluisi', 'Eleanor Norton', 'Eni Faleomavaega', 'Madeleine Bordallo'])
     try:
         all_rank[year][x]
         all_rank[year][y]
@@ -78,6 +76,7 @@ def read_rank_data(dirname = 'rank/'):
             reader = UnicodeReader(csvfile, delimiter = ",")
             for row in reader:
                 all_rank[year][row[1]] = row[0]
+                print row[1]
     return all_rank
 
 def svm_cv(data, data_target):
@@ -126,7 +125,7 @@ class UnicodeReader:
         return self
 
 all_rank = read_rank_data()
-house_utterances, congress_year = readdata.read_house_hearing()
+house_utterances, congress_year = readdata.read_house_hearing(dirname='../../data/small_house/')
 all_vectors = build_vectors()
 
 # print all_rank
