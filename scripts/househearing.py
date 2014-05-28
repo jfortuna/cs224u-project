@@ -54,8 +54,8 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
-            # hearing_map[speaker] = get_num_question_marks(combined_utterances)
+            # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['functions'])
+            hearing_map[speaker] = get_num_question_marks(combined_utterances)
 
             # hearing_map[speaker] = get_avg_utterance_length(len(utterances), combined_utterances) + \
             #                     get_sum_utterance_length(combined_utterances) + \
@@ -155,7 +155,11 @@ def generate_PR_curve(y_scores, y_true):
     pl.xlim([0.0, 1.0])
     pl.title('Precision-Recall example: AUC=%0.2f' % area)
     pl.legend(loc="lower left")
+    print precision
+    print recall
+    print thresholds
     pl.show()
+
 
 all_rank = read_rank_data()
 # house_utterances, congress_year = readdata.read_house_hearing(dirname='../../data/small_house/')
@@ -168,4 +172,4 @@ data, target = pair_rank(all_vectors)
 # print keyerrors
 y_scores, y_true = svm_cv(data, target)
 
-generate_PR_curve(y_scores, y_true)
+# generate_PR_curve(y_scores, y_true)
