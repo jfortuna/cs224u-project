@@ -78,9 +78,12 @@ def rank_lookup(x,y, year):
         if not y in no_vote_members:
             keyerrors.add(y)
         return -1;
-    if (all_rank[year][x] > all_rank[year][y]): return 1
-    if (all_rank[year][x] < all_rank[year][y]): return 0
-    else: -1
+
+    if abs(all_rank[year][x] - all_rank[year][y]) > 20:
+        if (all_rank[year][x] > all_rank[year][y]): return 1
+        if (all_rank[year][x] < all_rank[year][y]): return 0
+        else: return -1
+    else: return -1
 
 def read_rank_data(dirname = 'rank/'):
     all_rank = collections.defaultdict(lambda:{})
