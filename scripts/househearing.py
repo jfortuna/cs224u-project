@@ -5,7 +5,6 @@ import csv
 import collections
 import os
 import codecs
-import cStringIO
 from sklearn import cross_validation
 from sklearn import metrics
 from sklearn import svm
@@ -78,9 +77,10 @@ def read_rank_data(dirname = 'rank/'):
     for filename in os.listdir(base_path):
         year = filename[:4]
         with open(base_path + filename) as csvfile:
-            reader = UnicodeReader(csvfile, delimiter = ",")
+            reader = utils.UnicodeReader(csvfile, delimiter = ",")
             for row in reader:
                 all_rank[year][row[1]] = row[0]
+    print "Rank data read"
     return all_rank
 
 def svm_cv(data, data_target):
@@ -98,35 +98,6 @@ def svm_cv(data, data_target):
 	#print y_test
 	#print pred
 
-class UTF8Recoder:
-    """
-    Iterator that reads an encoded stream and reencodes the input to UTF-8
-    """
-    def __init__(self, f, encoding):
-        self.reader = codecs.getreader(encoding)(f)
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        return self.reader.next().encode("utf-8")
-
-class UnicodeReader:
-    """
-    A CSV reader which will iterate over lines in the CSV file "f",
-    which is encoded in the given encoding.
-    """
-
-    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
-        f = UTF8Recoder(f, encoding)
-        self.reader = csv.reader(f, dialect=dialect, **kwds)
-
-    def next(self):
-        row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]
-
-    def __iter__(self):
-        return self
 
 all_rank = read_rank_data()
 # house_utterances, congress_year = readdata.read_house_hearing(dirname='../../data/small_house/')
