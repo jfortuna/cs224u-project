@@ -34,5 +34,5 @@ def get_2011_12_changes():
                 additions.append(splits[2])
     return dict(zip(subtractions, additions))
 
-update_csv_with_2011_12_changes('rank/2011-112.csv')
-#print get_2011_12_changes()
+#update_csv_with_2011_12_changes('rank/1993-103.csv')
+print get_2011_12_changes()

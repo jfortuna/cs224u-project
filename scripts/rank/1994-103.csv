@@ -28,9 +28,9 @@
 27,Les Aspin,D,WI-1,
 27,Ron Dellums,D,CA-09,
 27,Romano Mazzoli,D,KY-3,
-27,Charles B. Rangel,D,NY-15,
+27,Charles Rangel,D,NY-15,
 27,Floyd Spence,R,SC-2,
-27,Bill Young,R,FL-10,
+27,C. Young,R,FL-10,
 34,George Brown,D,CA-42,1/3/1973
 34,Benjamin A. Gilman,R,NY-20,
 34,Ralph Regula,R,OH-16,
@@ -39,10 +39,10 @@
 34,Joe Moakley,D,MA-09,
 34,Carlos Moorhead,R,CA-27,
 34,Pat Schroeder,D,CO-1,
-34,Pete Stark,D,CA-13,
+34,Fortney Stark,D,CA-13,
 34,Gerry Studds,D,MA-10,
 34,Charlie Wilson,D,TX-02,
-45,Don Young,R,AK,3/6/1973
+45,Donald Young,R,AK,3/6/1973
 46,Cardiss Collins,D,IL-07,6/5/1973
 47,John Murtha,D,PA-12,2/5/1974
 48,"Andrew Jacobs, Jr.",D,IN-10,1/3/1975
@@ -62,11 +62,11 @@
 48,James Oberstar,D,MN-8,
 48,Philip Sharp,D,IN-02,
 48,Henry Waxman,D,CA-29,
-65,Ed Markey,D,MA-07,11/2/1976
+65,Edward Markey,D,MA-07,11/2/1976
 66,Douglas Applegate,D,OH-18,1/4/1977
 66,Anthony Beilenson,D,CA-24,
 66,David Bonior,D,MI-10,
-66,Norm Dicks,D,WA-6,
+66,Norman Dicks,D,WA-6,
 66,Dick Gephardt,D,MO-3,
 66,Dan Glickman,D,KS-4,
 66,Dale Kildee,D,MI-09,
@@ -92,7 +92,7 @@
 83,Bob Matsui,D,CA-05,
 83,Toby Roth,R,WI-8,
 83,Martin Olav Sabo,D,MN-5,
-83,James Sensenbrenner,R,WI-9,
+83,F. Sensenbrenner,R,WI-9,
 83,Olympia Snowe,R,ME-2,
 83,Gerald Solomon,R,NY-22,
 83,Charles Stenholm,D,TX-17,
@@ -100,7 +100,7 @@
 83,Mike Synar,D,OK-2,
 83,Bill Thomas,R,CA-21,
 83,Pat Williams,D,MT,
-103,Tom Petri,R,WI-6,4/3/1979
+103,Thomas Petri,R,WI-6,4/3/1979
 104,John Porter,R,IL-10,1/22/1980
 105,Billy Tauzin,D,LA-3,5/22/1980
 106,Thomas Bliley,R,VA-07,1/3/1981
@@ -120,7 +120,7 @@
 106,Dave McCurdy,D,OK-4,
 106,Sid Morrison,R,WA-1,
 106,Pat Roberts,R,KS-1,
-106,Hal Rogers,R,KY-5,
+106,Harold Rogers,R,KY-5,
 106,Marge Roukema,R,NJ-05,
 106,Chuck Schumer,D,NY-09,
 106,"E. Clay Shaw, Jr.",R,FL-22,
@@ -141,14 +141,14 @@
 135,Robert Borski,D,PA-03,
 135,Rick Boucher,D,VA-09,
 135,John Bryant,D,TX-32,
-135,Dan Burton,R,IN-06,
+135,Danny Burton,R,IN-06,
 135,Ron Coleman,D,TX-16,
-135,Jim Cooper,D,TN-4,
+135,James Cooper,D,TN-4,
 135,Richard Durbin,D,IL-20,
 135,Lane Evans,D,IL-17,
 135,George Gekas,R,PA-17,
 135,Nancy Johnson,R,CT-6,
-135,Marcy Kaptur,D,OH-09,
+135,Marcia Kaptur,D,OH-09,
 135,John Kasich,R,OH-12,
 135,Richard Lehman,D,CA-19,
 135,Sander Levin,D,MI-12,
@@ -170,7 +170,7 @@
 135,Don Sundquist,R,TN-7,
 135,Esteban Torres,D,CA-34,
 135,Robert Torricelli,D,NJ-09,
-135,Ed Towns,D,NY-10,
+135,Edolphus Towns,D,NY-10,
 135,Tim Valentine,D,NC-02,
 135,Barbara Vucanovich,R,NV-2,
 135,Alan Wheat,D,MO-5,
@@ -185,7 +185,7 @@
 183,Joe Barton,R,TX-06,
 183,Helen Bentley,R,MD-2,
 183,Sonny Callahan,R,AL-1,
-183,Howard Coble,R,NC-06,
+183,John Coble,R,NC-06,
 183,Larry Combest,R,TX-19,
 183,Tom DeLay,R,TX-22,
 183,Harris Fawell,R,IL-13,
@@ -215,7 +215,7 @@
 206,Dennis Hastert,R,IL-14,
 206,Jimmy Hayes,D,LA-7,
 206,Joel Hefley,R,CO-5,
-206,Wally Herger,R,CA-02,
+206,Walter Herger,R,CA-02,
 206,George Hochbrueckner,D,NY-01,
 206,Amo Houghton,R,NY-31,
 206,Jim Inhofe,R,OK-1,
@@ -233,7 +233,7 @@
 206,Louise Slaughter,D,NY-28,
 206,David Price,D,NC-04,
 206,Lamar Smith,R,TX-21,
-206,Fred Upton,R,MI-06,
+206,Frederick Upton,R,MI-06,
 206,Curt Weldon,R,PA-07,
 238,Nancy Pelosi,D,CA-08,6/2/1987
 239,Christopher Shays,R,CT-4,8/18/1987
@@ -253,7 +253,7 @@
 246,Greg Laughlin,D,TX-14,
 246,Nita Lowey,D,NY-18,
 246,Ronald Machtley,R,RI-1,
-246,Jim McDermott,D,WA-7,
+246,James McDermott,D,WA-7,
 246,Mike McNulty,D,NY-21,
 246,Richard Neal,D,MA-02,
 246,Mike Parker,D,MS-4,
@@ -264,7 +264,7 @@
 246,George Sangmeister,D,IL-11,
 246,Bill Sarpalius,D,TX-13,
 246,Steven Schiff,R,NM-1,
-246,Cliff Stearns,R,FL-06,
+246,Clifford Stearns,R,FL-06,
 246,John Tanner,D,TN-8,
 246,Jolene Unsoeld,D,WA-3,
 246,James Walsh,R,NY-25,
@@ -277,9 +277,9 @@
 277,Gene Taylor,D,MS-5,10/17/1989
 278,Craig Washington,D,TX-18,12/9/1989
 279,Susan Molinari,R,NY-13,3/20/1990
-279,José Serrano,D,NY-16,
+279,Jose Serrano,D,NY-16,
 281,Patsy Mink,D,HI-2,9/22/1990
-282,Rob Andrews,D,NJ-01,11/6/1990
+282,Robert Andrews,D,NJ-01,11/6/1990
 283,Neil Abercrombie,D,HI-1,1/3/1991
 283,Wayne Allard,R,CO-4,
 283,Thomas Andrews,D,ME-1,
@@ -288,7 +288,7 @@
 283,John Boehner,R,OH-08,
 283,Bill Brewster,D,OK-3,
 283,Barbara-Rose Collins,D,MI-15,
-283,Dave Camp,R,MI-04,
+283,David Camp,R,MI-04,
 283,Bud Cramer,D,AL-5,
 283,Duke Cunningham,R,CA-50,
 283,Rosa DeLauro,D,CT-3,
@@ -303,7 +303,7 @@
 283,Scott Klug,R,WI-2,
 283,Mike Kopetski,D,OR-5,
 283,Larry LaRocco,D,ID-1,
-283,Jim Moran,D,VA-08,
+283,James Moran,D,VA-08,
 283,Jim Nussle,R,IA-2,
 283,Bill Orton,D,UT-3,
 283,Collin Peterson,D,MN-7,
@@ -319,7 +319,7 @@
 283,Maxine Waters,D,CA-35,
 283,Bill Zeliff,R,NH-1,
 283,Dick Zimmer,R,NJ-12,
-322,Sam Johnson,R,TX-03,5/18/1991
+322,Samuel Johnson,R,TX-03,5/18/1991
 323,John Olver,D,MA-01,6/4/1991
 324,Ed Pastor,D,AZ-2,9/24/1991
 325,Lucien Blackwell,D,PA-02,11/5/1991
@@ -358,12 +358,12 @@
 328,Anna Eshoo,D,CA-14,
 328,Terry Everett,R,AL-2,
 328,Cleo Fields,D,LA-4,
-328,Bob Filner,D,CA-51,
+328,Robert Filner,D,CA-51,
 328,Eric Fingerhut,D,OH-19,
 328,Tillie Fowler,R,FL-04,
 328,Bob Franks,R,NJ-07,
 328,Elizabeth Furse,D,OR-1,
-328,Bob Goodlatte,R,VA-06,
+328,Robert Goodlatte,R,VA-06,
 328,Rod Grams,R,MN-6,
 328,Gene Green,D,TX-29,
 328,James Greenwood,R,PA-08,
@@ -381,7 +381,7 @@
 328,Bob Inglis,R,SC-4,
 328,Jay Inslee,D,WA-4,
 328,Ernest Istook,R,OK-5,
-328,Eddie Bernice Johnson,D,TX-30,
+328,E. Johnson,D,TX-30,
 328,Tim Hutchinson,R,AR-3,
 328,Don Johnson,D,GA-10,
 328,Jay Kim,R,CA-41,
@@ -402,7 +402,7 @@
 328,Paul McHale,D,PA-15,
 328,John McHugh,R,NY-24,
 328,Scott McInnis,R,CO-3,
-328,Buck McKeon,R,CA-25,
+328,Howard McKeon,R,CA-25,
 328,Cynthia McKinney,D,GA-04,
 328,Marty Meehan,D,MA-05,
 328,Carrie Meek,D,FL-17,
@@ -416,9 +416,9 @@
 328,Jack Quinn,R,NY-30,
 328,Mel Reynolds,D,IL-02,
 328,Lucille Roybal-Allard,D,CA-33,
-328,Ed Royce,R,CA-39,
+328,Edward Royce,R,CA-39,
 328,Bobby Rush,D,IL-01,
-328,Bobby Scott,D,VA-03,
+328,Robert Scott,D,VA-03,
 328,Lynn Schenk,D,CA-49,
 328,Karen Shepherd,D,UT-2,
 328,Nick Smith,R,MI-07,
@@ -429,7 +429,7 @@
 328,Karen Thurman,D,FL-05,
 328,Peter Torkildsen,R,MA-06,
 328,Walter Tucker,D,CA-37,
-328,Nydia Velázquez,D,NY-12,
+328,Nydia Velazquez,D,NY-12,
 328,Melvin Watt,D,NC-12,
 328,Lynn Woolsey,D,CA-06,
 328,Albert Wynn,D,MD-4,
