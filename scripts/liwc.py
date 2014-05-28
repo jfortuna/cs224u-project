@@ -43,3 +43,14 @@ with open('../liwc/quantifiers.txt', 'r') as f:
     for line in f:
         quantifiers.add(line.strip())
 
+sing_ppronouns = set()
+with open('../liwc/sing_ppronouns.txt', 'r') as f:
+    for line in f:
+        sing_ppronouns.add(line.strip())
+
+plural_ppronouns = set()
+with open('../liwc/plural_ppronouns.txt', 'r') as f:
+    for line in f:
+        plural_ppronouns.add(line.strip())
+
+

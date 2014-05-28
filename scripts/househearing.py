@@ -12,6 +12,19 @@ from sklearn import svm
 import numpy as np
 import sys
 
+
+######
+# articles
+# aux_verbs
+# conjunctions
+# adverbs
+# ipronouns
+# ppronouns
+# prepositions
+# quantifiers
+# singppronouns
+# pluralppronouns
+####
 sys.stdout = codecs.getwriter('utf-8')(sys.__stdout__)
 
 def get_avg_utterance_length(num_utterances, combined_utterances):
