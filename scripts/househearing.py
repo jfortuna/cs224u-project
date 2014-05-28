@@ -7,10 +7,16 @@ import collections
 import os
 import codecs
 from sklearn import cross_validation
+from sklearn.metrics import precision_recall_curve
 from sklearn import metrics
 from sklearn import svm
 import numpy as np
 import sys
+from sklearn import svm, datasets
+import random
+from sklearn.metrics import auc
+import pylab as pl
+
 
 
 ######
@@ -50,9 +56,9 @@ def build_vectors():
             combined_utterances = ' '.join(utterances)
             hearing_map[speaker] = get_num_question_marks(combined_utterances)
 
-            # get_avg_utterance_length(len(utterances), combined_utterances) + \
-                                # get_sum_utterance_length(combined_utterances) + \
-                                # utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
+            # hearing_map[speaker] = get_avg_utterance_length(len(utterances), combined_utterances) + \
+            #                     get_sum_utterance_length(combined_utterances) + \
+            #                     utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
         all_vectors.append(hearing_map)
     return all_vectors
 
@@ -121,20 +127,34 @@ def read_rank_data(dirname = 'rank/'):
     return all_rank
 
 def svm_cv(data, data_target):
-	X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
-	print "Training..."
-	clf = svm.LinearSVC()
-	clf.fit(X_train, y_train)
-	print "Testing..."
-	pred = clf.predict(X_test)
-	accuracy_score = metrics.accuracy_score(y_test, pred)
-	classification_report = metrics.classification_report(y_test, pred)
-	print accuracy_score
-	print classification_report
-	np.set_printoptions(threshold='nan')
-	#print y_test
-	#print pred
+    X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
+    print "Training..."
+    clf = svm.LinearSVC()
+    clf.fit(X_train, y_train)
+    print "Testing..."
+    pred = clf.predict(X_test)
+    accuracy_score = metrics.accuracy_score(y_test, pred)
+    classification_report = metrics.classification_report(y_test, pred)
+    print accuracy_score
+    print classification_report
+    np.set_printoptions(threshold='nan')
+    return (pred, y_test)
 
+def generate_PR_curve(y_scores, y_true):
+    # Compute Precision-Recall and plot curve
+    precision, recall, thresholds = precision_recall_curve(y_scores, y_true)
+    area = auc(recall, precision)
+    print("Area Under Curve: %0.2f" % area)
+
+    pl.clf()
+    pl.plot(recall, precision, label='Precision-Recall curve')
+    pl.xlabel('Recall')
+    pl.ylabel('Precision')
+    pl.ylim([0.0, 1.05])
+    pl.xlim([0.0, 1.0])
+    pl.title('Precision-Recall example: AUC=%0.2f' % area)
+    pl.legend(loc="lower left")
+    pl.show()
 
 all_rank = read_rank_data()
 # house_utterances, congress_year = readdata.read_house_hearing(dirname='../../data/small_house/')
@@ -145,4 +165,6 @@ all_vectors = build_vectors()
 keyerrors = set([])   
 data, target = pair_rank(all_vectors)
 # print keyerrors
-svm_cv(data, target)
+y_scores, y_true = svm_cv(data, target)
+
+generate_PR_curve(y_scores, y_true)
