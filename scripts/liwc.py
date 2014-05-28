@@ -53,4 +53,12 @@ with open('../liwc/plural_ppronouns.txt', 'r') as f:
     for line in f:
         plural_ppronouns.add(line.strip())
 
+negations = set()
+with open('../liwc/negate.txt', 'r') as f:
+    for line in f:
+        negations.add(line.strip())
 
+functions = set()
+with open('../liwc/function.txt', 'r') as f:
+    for line in f:
+        functions.add(line.strip())
