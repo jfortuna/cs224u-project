@@ -8,7 +8,7 @@ import cStringIO
 
 def get_liwc_counts_from_utterance(utterance):
     tokens = tokenize_utterance(utterance)
-    num_articles, num_aux_verbs, num_conjunctions, num_adverbs, num_ipronouns, num_ppronouns, num_prepositions, num_quantifiers, num_singppronouns, num_pluralppronouns = [0 for x in range(10)] 
+    num_articles, num_aux_verbs, num_conjunctions, num_adverbs, num_ipronouns, num_ppronouns, num_prepositions, num_quantifiers, num_singppronouns, num_pluralppronouns, num_negations, num_functions = [0 for x in range(12)] 
     #initializing 8 different variables all to zero
     for token in tokens:
         if token in liwc.articles:
@@ -31,11 +31,14 @@ def get_liwc_counts_from_utterance(utterance):
             num_singppronouns += 1
         if token in liwc.plural_ppronouns:
             num_pluralppronouns += 1
-    
-    return (num_articles, num_aux_verbs, num_conjunctions, num_adverbs, num_ipronouns, num_ppronouns, num_prepositions, num_quantifiers, num_singppronouns, num_pluralppronouns)
+        if token in liwc.negations:
+            num_negations += 1
+        if token in liwc.functions:
+            num_functions += 1
+    return (num_articles, num_aux_verbs, num_conjunctions, num_adverbs, num_ipronouns, num_ppronouns, num_prepositions, num_quantifiers, num_singppronouns, num_pluralppronouns, num_negations, num_functions)
 
 def get_liwc_features_of_interest(utterance, features_of_interest):
-    articles, aux_verbs, conjunctions, adverbs, ipronouns, ppronouns, prepositions, quantifiers, singppronouns, pluralppronouns = get_liwc_counts_from_utterance(utterance)
+    articles, aux_verbs, conjunctions, adverbs, ipronouns, ppronouns, prepositions, quantifiers, singppronouns, pluralppronouns, negations, functions = get_liwc_counts_from_utterance(utterance)
 
     returned_counts = []
     for feature in features_of_interest:
