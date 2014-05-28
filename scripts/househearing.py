@@ -36,6 +36,11 @@ def get_liwc_features(combined_utterances):
 def get_sum_utterance_length(combined_utterances):
     return [len(combined_utterances.split())]
 
+def get_num_question_marks(combined_utterances):
+    # print combined_utterances.count('?')
+    return [combined_utterances.count('?')]
+
+
 def build_vectors():
     all_vectors = []
     for index, hearing in enumerate(house_utterances):
@@ -43,10 +48,11 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = get_avg_utterance_length(len(utterances), combined_utterances) + \
-                                get_sum_utterance_length(combined_utterances) + \
-                                utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
-            #get_avg_utterance_length + get_liwc_features + get_sum_utterance_length
+            hearing_map[speaker] = get_num_question_marks(combined_utterances)
+
+            # get_avg_utterance_length(len(utterances), combined_utterances) + \
+                                # get_sum_utterance_length(combined_utterances) + \
+                                # utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
         all_vectors.append(hearing_map)
     return all_vectors
 
@@ -66,7 +72,8 @@ def pair_rank(raw_vectors):
             year = congress_year[index]
             person1 = combo[0]
             person2 = combo[1]
-            new_instance = concat_vectors(hearing[person1], hearing[person2])
+            # new_instance = concat_vectors(hearing[person1], hearing[person2])
+            new_instance = diff_vectors(hearing[person1], hearing[person2])
             year = congress_year[index]
             rel_rank = rank_lookup(person1, person2, year)
             if rel_rank!= -1 and rel_rank != None:
@@ -92,9 +99,12 @@ def rank_lookup(x,y, year):
             keyerrors.add(y)
         return -1;
 
-    if abs(all_rank[year][x] - all_rank[year][y]) > 20:
-        if (all_rank[year][x] > all_rank[year][y]): return 1
-        if (all_rank[year][x] < all_rank[year][y]): return 0
+    x_rank = int(all_rank[year][x])
+    y_rank = int(all_rank[year][y])
+    # print x_rank, y_rank, abs(x_rank - y_rank)
+    if abs(x_rank - y_rank) > 20:
+        if x_rank > y_rank: return 1
+        if x_rank < y_rank: return 0
         else: return -1
     else: return -1
 
