@@ -57,7 +57,8 @@ def build_vectors():
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
             hearing_map[speaker] = get_num_question_marks(combined_utterances)
-            hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['negations'])
+            # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
+            #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'singppronouns', 'pluralppronouns'])
             # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns', 'negations'])
             # hearing_map[speaker] = get_num_question_marks(combined_utterances)
             # hearing_map[speaker] = get_avg_utterance_length(len(utterances), combined_utterances) + \
@@ -175,4 +176,4 @@ data, target = pair_rank(all_vectors)
 # print keyerrors
 y_scores, y_true = svm_cv(data, target)
 
-generate_PR_curve(y_scores, y_true)
+# generate_PR_curve(y_scores, y_true)
