@@ -36,7 +36,6 @@ def get_liwc_features(combined_utterances):
 def get_sum_utterance_length(combined_utterances):
     return len(combined_utterances.split())
 
-
 def build_vectors():
     all_vectors = []
     for index, hearing in enumerate(house_utterances):
@@ -44,7 +43,8 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = get_avg_utterance_length + get_liwc_features + get_sum_utterance_length;
+            hearing_map[speaker] = get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
+            #get_avg_utterance_length + get_liwc_features + get_sum_utterance_length
         all_vectors.append(hearing_map)
     return all_vectors
 
@@ -62,21 +62,14 @@ def pair_rank(raw_vectors):
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
             year = congress_year[index]
-            # print year
             person1 = combo[0]
-            # print combo
             person2 = combo[1]
-            # print person1, person2
-
-            new_instance = diff_vectors(house[person1], house[person2])
-            # print index
+            new_instance = concat_vectors(hearing[person1], hearing[person2])
             year = congress_year[index]
-            # print year
             rel_rank = rank_lookup(person1, person2, year)
             if rel_rank!= -1 and rel_rank != None:
                 pair_target.append(rel_rank)
                 pair_data.append(new_instance)
-
     # print pair_data
     # print pair_target
     return (pair_data, pair_target)
