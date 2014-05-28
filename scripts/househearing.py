@@ -24,7 +24,9 @@ import sys
 # quantifiers
 # singppronouns
 # pluralppronouns
-####
+# negations
+# functions
+######
 sys.stdout = codecs.getwriter('utf-8')(sys.__stdout__)
 
 def get_avg_utterance_length(num_utterances, combined_utterances):
@@ -48,7 +50,8 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
+            # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['negations'])
+            hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns', 'negations'])
             # hearing_map[speaker] = get_num_question_marks(combined_utterances)
 
             # get_avg_utterance_length(len(utterances), combined_utterances) + \
