@@ -1,3 +1,4 @@
+from __future__ import division
 import readdata
 import utils
 from itertools import combinations
@@ -13,6 +14,16 @@ import sys
 
 sys.stdout = codecs.getwriter('utf-8')(sys.__stdout__)
 
+def get_avg_utterance_length(num_utterances, combined_utterances):
+    return len(combined_utterances.split())/num_utterances;
+
+def get_liwc_features(combined_utterances):
+    return list(utils.get_liwc_counts_from_utterance(combined_utterances))
+
+def get_sum_utterance_length(combined_utterances):
+    return len(combined_utterances.split())
+
+
 def build_vectors():
     all_vectors = []
     for index, hearing in enumerate(house_utterances):
@@ -20,7 +31,7 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = list(utils.get_liwc_counts_from_utterance(combined_utterances))
+            hearing_map[speaker] = get_avg_utterance_length + get_liwc_features + get_sum_utterance_length;
         all_vectors.append(hearing_map)
     return all_vectors
 
