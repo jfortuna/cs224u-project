@@ -35,6 +35,11 @@ def build_vectors():
         all_vectors.append(hearing_map)
     return all_vectors
 
+def concat_vectors(person1_vector, person2_vector):
+    return person1_vector + person2_vector
+
+def diff_vectors(person1_vector, person2_vector):
+    return [x - y for x,y in zip(person1_vector, person2_vector)]
 
 def pair_rank(raw_vectors):
     pair_data = []
@@ -50,7 +55,7 @@ def pair_rank(raw_vectors):
             person2 = combo[1]
             # print person1, person2
 
-            new_instance = hearing[person1] + hearing[person2]
+            new_instance = diff_vectors(house[person1], house[person2])
             # print index
             year = congress_year[index]
             # print year
