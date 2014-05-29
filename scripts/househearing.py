@@ -56,7 +56,18 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = get_num_question_marks(combined_utterances)
+            # hearing_map[speaker] = get_num_question_marks(combined_utterances)
+            
+            # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
+            #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
+
+            hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
+
+
+            # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
+            #                         get_avg_utterance_length(len(utterances), combined_utterances) + \
+            #                         get_sum_utterance_length(combined_utterances)
+
             # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
             #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'singppronouns', 'pluralppronouns'])
             # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns', 'negations'])
@@ -113,7 +124,7 @@ def rank_lookup(x,y, year):
     x_rank = int(all_rank[year][x])
     y_rank = int(all_rank[year][y])
     # print x_rank, y_rank, abs(x_rank - y_rank)
-    if abs(x_rank - y_rank) > 20:
+    if abs(x_rank - y_rank) > 5:
         if x_rank > y_rank: return 1
         if x_rank < y_rank: return 0
         else: return -1
