@@ -148,6 +148,8 @@ def svm_cv(data, data_target):
     pred = clf.predict(X_test)
     accuracy_score = metrics.accuracy_score(y_test, pred)
     classification_report = metrics.classification_report(y_test, pred)
+    support = selector.get_support()
+    print support
     print accuracy_score
     print classification_report
     np.set_printoptions(threshold='nan')
