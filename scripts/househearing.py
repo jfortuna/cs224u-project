@@ -10,6 +10,7 @@ from sklearn import cross_validation
 from sklearn.metrics import precision_recall_curve
 from sklearn import metrics
 from sklearn import svm
+from sklearn.feature_selection import SelectPercentile, f_classif
 import numpy as np
 import sys
 from sklearn import svm, datasets
@@ -48,7 +49,6 @@ def get_num_question_marks(combined_utterances):
     # print combined_utterances.count('?')
     return [combined_utterances.count('?')]
 
-
 def build_vectors():
     all_vectors = []
     for index, hearing in enumerate(house_utterances):
@@ -56,18 +56,13 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            # hearing_map[speaker] = get_num_question_marks(combined_utterances)
-            
+            hearing_map[speaker] = get_liwc_features(combined_utterances) + get_num_question_marks(combined_utterances) + get_avg_utterance_length(len(utterances), combined_utterances) + get_sum_utterance_length(combined_utterances)
             # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
             #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
-
-            hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
-
-
+            # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
             # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
             #                         get_avg_utterance_length(len(utterances), combined_utterances) + \
             #                         get_sum_utterance_length(combined_utterances)
-
             # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
             #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'singppronouns', 'pluralppronouns'])
             # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns', 'negations'])
@@ -145,8 +140,10 @@ def read_rank_data(dirname = 'rank/'):
 def svm_cv(data, data_target):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
     print "Training..."
+    selector = SelectPercentile(f_classif, percentile=10)
+    selector.fit(X_train, y_train)
     clf = svm.LinearSVC()
-    clf.fit(X_train, y_train)
+    clf.fit(selector.transform(X_train), y_train)
     print "Testing..."
     pred = clf.predict(X_test)
     accuracy_score = metrics.accuracy_score(y_test, pred)
