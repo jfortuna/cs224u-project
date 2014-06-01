@@ -37,18 +37,10 @@ import pylab as pl
 sys.stdout = codecs.getwriter('utf-8')(sys.__stdout__)
 
 def get_friend_count(combined_utterances):
-    friend_counter = combined_utterances.count('friend')
-    # print "friend: ", friend_counter
-    friendS_counter = combined_utterances.count('friends')
-    # print "friend(s): ", friendS_counter
-    return [friend_counter]
+    return [combined_utterances.count('friend')]
 
 def get_colleague_count(combined_utterances):
-    colleague_counter = combined_utterances.count('colleague')
-    # print "Colleague: ", colleague_counter
-    colleagueS_counter = combined_utterances.count('colleagues')
-    # print "Colleague(s): ", colleagueS_counter
-    return [colleague_counter]
+    return [combined_utterances.count('colleague')]
 
 def get_avg_utterance_length(num_utterances, combined_utterances):
     return [len(combined_utterances.split())/num_utterances]
@@ -158,11 +150,11 @@ def read_rank_data(dirname = 'rank/'):
 def svm_cv(data, data_target):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
     print "Training..."
-    # selector = SelectPercentile(f_classif, percentile=10)
-    # selector.fit(X_train, y_train)
+    selector = SelectPercentile(f_classif, percentile=10)
+    selector.fit(X_train, y_train)
     clf = svm.LinearSVC()
-    clf.fit(X_train, y_train)
-    # clf.fit(selector.transform(X_train), y_train)
+    # clf.fit(X_train, y_train)
+    clf.fit(selector.transform(X_train), y_train)
     print "Testing..."
     pred = clf.predict(selector.transform(X_test))
     accuracy_score = metrics.accuracy_score(y_test, pred)
@@ -205,4 +197,4 @@ data, target = pair_rank(all_vectors)
 # print keyerrors
 y_scores, y_true = svm_cv(data, target)
 
-generate_PR_curve(y_scores, y_true)
+# generate_PR_curve(y_scores, y_true)
