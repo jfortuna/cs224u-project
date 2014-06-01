@@ -145,7 +145,7 @@ def svm_cv(data, data_target):
     clf = svm.LinearSVC()
     clf.fit(selector.transform(X_train), y_train)
     print "Testing..."
-    pred = clf.predict(X_test)
+    pred = clf.predict(selector.transform(X_test))
     accuracy_score = metrics.accuracy_score(y_test, pred)
     classification_report = metrics.classification_report(y_test, pred)
     support = selector.get_support()
