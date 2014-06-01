@@ -52,7 +52,7 @@ def get_num_question_marks(combined_utterances):
 def build_vectors():
     all_vectors = []
     for index, hearing in enumerate(house_utterances):
-        print 'Building vectors for hearing', index
+        #print 'Building vectors for hearing', index
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
@@ -83,7 +83,7 @@ def pair_rank(raw_vectors):
     pair_data = []
     pair_target = []
     for index, hearing in enumerate(raw_vectors):
-        print 'Calculating ranks for hearing', index
+        #print 'Calculating ranks for hearing', index
         combos  = combinations(hearing.keys(), 2)
         for combo in combos:
             year = congress_year[index]
@@ -119,7 +119,7 @@ def rank_lookup(x,y, year):
     x_rank = int(all_rank[year][x])
     y_rank = int(all_rank[year][y])
     # print x_rank, y_rank, abs(x_rank - y_rank)
-    if abs(x_rank - y_rank) > 5:
+    if abs(x_rank - y_rank) > 20:
         if x_rank > y_rank: return 1
         if x_rank < y_rank: return 0
         else: return -1
