@@ -36,6 +36,20 @@ import pylab as pl
 ######
 sys.stdout = codecs.getwriter('utf-8')(sys.__stdout__)
 
+def get_friend_count(combined_utterances):
+    friend_counter = combined_utterances.count('friend')
+    # print "friend: ", friend_counter
+    friendS_counter = combined_utterances.count('friends')
+    # print "friend(s): ", friendS_counter
+    return [friend_counter]
+
+def get_colleague_count(combined_utterances):
+    colleague_counter = combined_utterances.count('colleague')
+    # print "Colleague: ", colleague_counter
+    colleagueS_counter = combined_utterances.count('colleagues')
+    # print "Colleague(s): ", colleagueS_counter
+    return [colleague_counter]
+
 def get_avg_utterance_length(num_utterances, combined_utterances):
     return [len(combined_utterances.split())/num_utterances]
 
@@ -56,8 +70,12 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = get_liwc_features(combined_utterances) + get_num_question_marks(combined_utterances) + get_avg_utterance_length(len(utterances), combined_utterances) + get_sum_utterance_length(combined_utterances)
-            # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
+
+            hearing_map[speaker] = get_friend_count(combined_utterances) + get_colleague_count(combined_utterances) + \
+                                    get_num_question_marks(combined_utterances)
+                                    # get_avg_utterance_length(len(utterances), combined_utterances)
+            # hearing_map[speaker] = get_liwc_features(combined_utterances) + get_num_question_marks(combined_utterances) + get_avg_utterance_length(len(utterances), combined_utterances) + get_sum_utterance_length(combined_utterances)
+            # hearing_map[speaker] = get_num_question_marks(combined_utterances) 
             #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
             # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
             # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
@@ -119,7 +137,7 @@ def rank_lookup(x,y, year):
     x_rank = int(all_rank[year][x])
     y_rank = int(all_rank[year][y])
     # print x_rank, y_rank, abs(x_rank - y_rank)
-    if abs(x_rank - y_rank) > 5:
+    if abs(x_rank - y_rank) > 20:
         if x_rank > y_rank: return 1
         if x_rank < y_rank: return 0
         else: return -1
@@ -140,10 +158,11 @@ def read_rank_data(dirname = 'rank/'):
 def svm_cv(data, data_target):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
     print "Training..."
-    selector = SelectPercentile(f_classif, percentile=10)
-    selector.fit(X_train, y_train)
+    # selector = SelectPercentile(f_classif, percentile=10)
+    # selector.fit(X_train, y_train)
     clf = svm.LinearSVC()
-    clf.fit(selector.transform(X_train), y_train)
+    clf.fit(X_train, y_train)
+    # clf.fit(selector.transform(X_train), y_train)
     print "Testing..."
     pred = clf.predict(X_test)
     accuracy_score = metrics.accuracy_score(y_test, pred)
@@ -157,7 +176,7 @@ def generate_PR_curve(y_scores, y_true):
     # Compute Precision-Recall and plot curve
     precision, recall, thresholds = precision_recall_curve(y_scores, y_true)
     area = auc(recall, precision)
-    print("Area Under Curve: %0.2f" % area)
+    # print("Area Under Curve: %0.2f" % area)
 
     pl.clf()
     pl.plot(recall, precision, label='Precision-Recall curve')
@@ -184,4 +203,4 @@ data, target = pair_rank(all_vectors)
 # print keyerrors
 y_scores, y_true = svm_cv(data, target)
 
-# generate_PR_curve(y_scores, y_true)
+generate_PR_curve(y_scores, y_true)
