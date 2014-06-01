@@ -62,7 +62,7 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-            hearing_map[speaker] = get_liwc_features(combined_utterances) + get_num_question_marks(combined_utterances) + get_avg_utterance_length(len(utterances), combined_utterances) + get_sum_utterance_length(combined_utterances) + get_friend_count(ocmbined_utterances) + get_colleague_count(combined_utterances)
+            hearing_map[speaker] = get_liwc_features(combined_utterances) + get_num_question_marks(combined_utterances) + get_avg_utterance_length(len(utterances), combined_utterances) + get_sum_utterance_length(combined_utterances) + get_friend_count(combined_utterances) + get_colleague_count(combined_utterances)
         all_vectors.append(hearing_map)
     return all_vectors
 
@@ -132,22 +132,24 @@ def read_rank_data(dirname = 'rank/'):
 
 def svm_cv(data, data_target):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
-    print "Training..."
-    selector = SelectPercentile(f_classif, percentile=10)
-    selector.fit(X_train, y_train)
-    clf = svm.LinearSVC()
-    # clf.fit(X_train, y_train)
-    clf.fit(selector.transform(X_train), y_train)
-    print "Testing..."
-    pred = clf.predict(selector.transform(X_test))
-    accuracy_score = metrics.accuracy_score(y_test, pred)
-    classification_report = metrics.classification_report(y_test, pred)
-    support = selector.get_support()
-    print support
-    print accuracy_score
-    print classification_report
-    np.set_printoptions(threshold='nan')
-    return (pred, y_test)
+    percentiles = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    for percentile in percentiles:
+        print "*" * 79
+        print "Training... using top", percentile, "% features"
+        selector = SelectPercentile(f_classif, percentile)
+        selector.fit(X_train, y_train)
+        clf = svm.LinearSVC()
+        clf.fit(selector.transform(X_train), y_train)
+        print "Testing..."
+        pred = clf.predict(selector.transform(X_test))
+        accuracy_score = metrics.accuracy_score(y_test, pred)
+        classification_report = metrics.classification_report(y_test, pred)
+        support = selector.get_support()
+        print support
+        print accuracy_score
+        print classification_report
+    return (0, 0)
+    # return (pred, y_test)
 
 def generate_PR_curve(y_scores, y_true):
     # Compute Precision-Recall and plot curve
