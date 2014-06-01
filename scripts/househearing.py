@@ -62,24 +62,7 @@ def build_vectors():
         hearing_map = {}
         for speaker, utterances in hearing.iteritems():
             combined_utterances = ' '.join(utterances)
-
-            hearing_map[speaker] = get_friend_count(combined_utterances) + get_colleague_count(combined_utterances) + \
-                                    get_num_question_marks(combined_utterances)
-                                    # get_avg_utterance_length(len(utterances), combined_utterances)
-            # hearing_map[speaker] = get_liwc_features(combined_utterances) + get_num_question_marks(combined_utterances) + get_avg_utterance_length(len(utterances), combined_utterances) + get_sum_utterance_length(combined_utterances)
-            # hearing_map[speaker] = get_num_question_marks(combined_utterances) 
-            #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
-            # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'functions'])
-            # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
-            #                         get_avg_utterance_length(len(utterances), combined_utterances) + \
-            #                         get_sum_utterance_length(combined_utterances)
-            # hearing_map[speaker] = get_num_question_marks(combined_utterances) + \
-            #                         utils.get_liwc_features_of_interest(combined_utterances, ['negations', 'singppronouns', 'pluralppronouns'])
-            # hearing_map[speaker] = utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns', 'negations'])
-            # hearing_map[speaker] = get_num_question_marks(combined_utterances)
-            # hearing_map[speaker] = get_avg_utterance_length(len(utterances), combined_utterances) + \
-            #                     get_sum_utterance_length(combined_utterances) + \
-            #                     utils.get_liwc_features_of_interest(combined_utterances, ['singppronouns', 'pluralppronouns'])
+            hearing_map[speaker] = get_liwc_features(combined_utterances) + get_num_question_marks(combined_utterances) + get_avg_utterance_length(len(utterances), combined_utterances) + get_sum_utterance_length(combined_utterances) + get_friend_count(ocmbined_utterances) + get_colleague_count(combined_utterances)
         all_vectors.append(hearing_map)
     return all_vectors
 
