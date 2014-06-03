@@ -10,7 +10,7 @@ from sklearn import cross_validation
 from sklearn.metrics import precision_recall_curve
 from sklearn import metrics
 from sklearn import svm
-from sklearn.feature_selection import SelectPercentile, f_classif
+from sklearn.feature_selection import SelectPercentile, f_classif, chi2
 import numpy as np
 import sys
 from sklearn import svm, datasets
@@ -52,7 +52,6 @@ def get_sum_utterance_length(combined_utterances):
     return [len(combined_utterances.split())]
 
 def get_num_question_marks(combined_utterances):
-    # print combined_utterances.count('?')
     return [combined_utterances.count('?')]
 
 def build_vectors():
@@ -89,8 +88,6 @@ def pair_rank(raw_vectors):
             if rel_rank!= -1 and rel_rank != None:
                 pair_target.append(rel_rank)
                 pair_data.append(new_instance)
-    # print pair_data
-    # print pair_target
     return (pair_data, pair_target)
 
 
@@ -136,38 +133,32 @@ def svm_cv(data, data_target):
     for percentile in percentiles:
         print "*" * 79
         print "Training... using top", percentile, "% features"
+        # selector = SelectPercentile(chi2, percentile)
         selector = SelectPercentile(f_classif, percentile)
         selector.fit(X_train, y_train)
-        clf = svm.LinearSVC()
+        clf = svm.SVC(kernel='linear', probability=True)
         clf.fit(selector.transform(X_train), y_train)
         print "Testing..."
         pred = clf.predict(selector.transform(X_test))
+        probs = pred.predict_proba(selector.transfrom(X_test))
         accuracy_score = metrics.accuracy_score(y_test, pred)
         classification_report = metrics.classification_report(y_test, pred)
         support = selector.get_support()
         print support
         print accuracy_score
         print classification_report
-    return (0, 0)
-    # return (pred, y_test)
+        precision, recall, thresholds = precision_recall_curve(y_test, probs[:, 1])
+        generate_PR_curve(precision, recall, thresholds)
 
-def generate_PR_curve(y_scores, y_true):
-    # Compute Precision-Recall and plot curve
-    precision, recall, thresholds = precision_recall_curve(y_scores, y_true)
-    area = auc(recall, precision)
-    # print("Area Under Curve: %0.2f" % area)
-
+def generate_PR_curve(precision, recall, thresholds):
     pl.clf()
     pl.plot(recall, precision, label='Precision-Recall curve')
     pl.xlabel('Recall')
     pl.ylabel('Precision')
     pl.ylim([0.0, 1.05])
     pl.xlim([0.0, 1.0])
-    pl.title('Precision-Recall example: AUC=%0.2f' % area)
+    pl.title('Precision-Recall curve')
     pl.legend(loc="lower left")
-    print precision
-    print recall
-    print thresholds
     pl.show()
 
 
@@ -180,6 +171,5 @@ all_vectors = build_vectors()
 keyerrors = set([])   
 data, target = pair_rank(all_vectors)
 # print keyerrors
-y_scores, y_true = svm_cv(data, target)
+svm_cv(data, target)
 
-# generate_PR_curve(y_scores, y_true)
