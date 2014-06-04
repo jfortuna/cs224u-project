@@ -10,7 +10,7 @@ from sklearn import cross_validation
 from sklearn.metrics import precision_recall_curve
 from sklearn import metrics
 from sklearn import svm
-from sklearn.feature_selection import SelectPercentile, f_classif, chi2
+from sklearn.feature_selection import SelectFdr, f_classif, chi2
 import numpy as np
 import sys
 from sklearn import svm, datasets
@@ -129,26 +129,24 @@ def read_rank_data(dirname = 'rank/'):
 
 def svm_cv(data, data_target):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(data, data_target)
-    percentiles = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    for percentile in percentiles:
-        print "*" * 79
-        print "Training... using top", percentile, "% features"
-        # selector = SelectPercentile(chi2, percentile)
-        selector = SelectPercentile(f_classif, percentile)
-        selector.fit(X_train, y_train)
-        clf = svm.SVC(kernel='linear', probability=True)
-        clf.fit(selector.transform(X_train), y_train)
-        print "Testing..."
-        pred = clf.predict(selector.transform(X_test))
-        probs = pred.predict_proba(selector.transfrom(X_test))
-        accuracy_score = metrics.accuracy_score(y_test, pred)
-        classification_report = metrics.classification_report(y_test, pred)
-        support = selector.get_support()
-        print support
-        print accuracy_score
-        print classification_report
-        precision, recall, thresholds = precision_recall_curve(y_test, probs[:, 1])
-        generate_PR_curve(precision, recall, thresholds)
+    print "*" * 79
+    print "Training..."
+    # selector = SelectFdr(chi2)
+    selector = SelectFdr(f_classif)
+    selector.fit(X_train, y_train)
+    clf = svm.SVC(kernel='linear', probability=True)
+    clf.fit(selector.transform(X_train), y_train)
+    print "Testing..."
+    pred = clf.predict(selector.transform(X_test))
+    probs = pred.predict_proba(selector.transfrom(X_test))
+    accuracy_score = metrics.accuracy_score(y_test, pred)
+    classification_report = metrics.classification_report(y_test, pred)
+    support = selector.get_support()
+    print support
+    print accuracy_score
+    print classification_report
+    precision, recall, thresholds = precision_recall_curve(y_test, probs[:, 1])
+    # generate_PR_curve(precision, recall, thresholds)
 
 def generate_PR_curve(precision, recall, thresholds):
     pl.clf()
